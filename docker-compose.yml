@@ -1,0 +1,44 @@
+version: '3.8'
+
+services:
+  backend:
+    build: ./backend
+    ports:
+      - "5001:5000"
+    volumes:
+      - ./backend:/app
+      - ./dr-training-r-tinopathie-diab-tique.ipynb:/app/dr-training-r-tinopathie-diab-tique.ipynb
+      - ./glaucome-training.ipynb:/app/glaucome-training.ipynb
+    environment:
+      - MONGO_URI=mongodb://mongo:27017/ophtia
+    networks:
+      - ophtia-net
+    depends_on:
+      - mongo
+
+  frontend:
+    build: ./frontend
+    ports:
+      - "8501:8501"
+    volumes:
+      - ./frontend:/app
+    networks:
+      - ophtia-net
+    depends_on:
+      - backend
+
+  mongo:
+    image: mongo:latest
+    ports:
+      - "27017:27017"
+    volumes:
+      - mongo-data:/data/db
+    networks:
+      - ophtia-net
+
+volumes:
+  mongo-data:
+
+networks:
+  ophtia-net:
+    driver: bridge
