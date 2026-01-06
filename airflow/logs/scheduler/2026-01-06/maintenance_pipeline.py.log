@@ -1,0 +1,18 @@
+[2026-01-06T04:35:07.728+0000] {processor.py:157} INFO - Started process (PID=164) to work on /opt/airflow/dags/maintenance_pipeline.py
+[2026-01-06T04:35:07.731+0000] {processor.py:829} INFO - Processing file /opt/airflow/dags/maintenance_pipeline.py for tasks to queue
+[2026-01-06T04:35:07.735+0000] {logging_mixin.py:154} INFO - [2026-01-06T04:35:07.734+0000] {dagbag.py:536} INFO - Filling up the DagBag from /opt/airflow/dags/maintenance_pipeline.py
+[2026-01-06T04:35:08.070+0000] {processor.py:839} INFO - DAG(s) dict_keys(['maintenance_pipeline']) retrieved from /opt/airflow/dags/maintenance_pipeline.py
+[2026-01-06T04:35:08.892+0000] {logging_mixin.py:154} INFO - [2026-01-06T04:35:08.891+0000] {manager.py:499} INFO - Created Permission View: %s
+[2026-01-06T04:35:08.914+0000] {logging_mixin.py:154} INFO - [2026-01-06T04:35:08.913+0000] {manager.py:499} INFO - Created Permission View: %s
+[2026-01-06T04:35:09.048+0000] {logging_mixin.py:154} INFO - [2026-01-06T04:35:09.047+0000] {manager.py:499} INFO - Created Permission View: %s
+[2026-01-06T04:35:09.050+0000] {logging_mixin.py:154} INFO - [2026-01-06T04:35:09.049+0000] {dag.py:2941} INFO - Sync 1 DAGs
+[2026-01-06T04:35:09.090+0000] {logging_mixin.py:154} INFO - [2026-01-06T04:35:09.090+0000] {dag.py:2963} INFO - Creating ORM DAG for maintenance_pipeline
+[2026-01-06T04:35:09.118+0000] {logging_mixin.py:154} INFO - [2026-01-06T04:35:09.118+0000] {dag.py:3722} INFO - Setting next_dagrun for maintenance_pipeline to 2026-01-05T02:00:00+00:00, run_after=2026-01-06T02:00:00+00:00
+[2026-01-06T04:35:09.177+0000] {processor.py:179} INFO - Processing /opt/airflow/dags/maintenance_pipeline.py took 1.456 seconds
+[2026-01-06T04:35:39.461+0000] {processor.py:157} INFO - Started process (PID=182) to work on /opt/airflow/dags/maintenance_pipeline.py
+[2026-01-06T04:35:39.466+0000] {processor.py:829} INFO - Processing file /opt/airflow/dags/maintenance_pipeline.py for tasks to queue
+[2026-01-06T04:35:39.469+0000] {logging_mixin.py:154} INFO - [2026-01-06T04:35:39.467+0000] {dagbag.py:536} INFO - Filling up the DagBag from /opt/airflow/dags/maintenance_pipeline.py
+[2026-01-06T04:35:39.646+0000] {processor.py:839} INFO - DAG(s) dict_keys(['maintenance_pipeline']) retrieved from /opt/airflow/dags/maintenance_pipeline.py
+[2026-01-06T04:35:39.768+0000] {logging_mixin.py:154} INFO - [2026-01-06T04:35:39.767+0000] {dag.py:2941} INFO - Sync 1 DAGs
+[2026-01-06T04:35:39.867+0000] {logging_mixin.py:154} INFO - [2026-01-06T04:35:39.867+0000] {dag.py:3722} INFO - Setting next_dagrun for maintenance_pipeline to 2026-01-05T02:00:00+00:00, run_after=2026-01-06T02:00:00+00:00
+[2026-01-06T04:35:39.895+0000] {processor.py:179} INFO - Processing /opt/airflow/dags/maintenance_pipeline.py took 0.446 seconds

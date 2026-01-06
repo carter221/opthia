@@ -1,0 +1,23 @@
+[2026-01-06T04:35:07.536+0000] {manager.py:487} INFO - Processing files using up to 2 processes at a time 
+[2026-01-06T04:35:07.537+0000] {manager.py:488} INFO - Process each file at most once every 30 seconds
+[2026-01-06T04:35:07.539+0000] {manager.py:489} INFO - Checking for new files in /opt/airflow/dags every 300 seconds
+[2026-01-06T04:35:07.540+0000] {manager.py:755} INFO - Searching for files in /opt/airflow/dags
+[2026-01-06T04:35:07.552+0000] {manager.py:758} INFO - There are 2 files in /opt/airflow/dags
+[2026-01-06T04:35:07.808+0000] {manager.py:887} INFO - 
+================================================================================
+DAG File Processing Stats
+
+File Path                                    PID  Runtime      # DAGs    # Errors  Last Runtime    Last Run
+-----------------------------------------  -----  ---------  --------  ----------  --------------  ----------
+/opt/airflow/dags/diagnostic_pipeline.py     167  0.08s             0           0
+/opt/airflow/dags/maintenance_pipeline.py    164  0.10s             0           0
+================================================================================
+[2026-01-06T04:35:38.388+0000] {manager.py:887} INFO - 
+================================================================================
+DAG File Processing Stats
+
+File Path                                  PID    Runtime      # DAGs    # Errors  Last Runtime    Last Run
+-----------------------------------------  -----  ---------  --------  ----------  --------------  -------------------
+/opt/airflow/dags/diagnostic_pipeline.py                            1           0  12.90s          2026-01-06T04:35:20
+/opt/airflow/dags/maintenance_pipeline.py                           1           0  1.50s           2026-01-06T04:35:09
+================================================================================

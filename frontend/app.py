@@ -2,47 +2,117 @@ import streamlit as st
 import requests
 from PIL import Image
 import io
+import base64
 
-st.title("Diagnostic d'Ophtalmologie")
+st.set_page_config(page_title="Diagnostic Ophtalmologique", layout="wide")
+st.title("🏥 Diagnostic d'Ophtalmologie")
 
 pathology_options = {
     "Rétinopathie Diabétique": "rd",
     "Glaucome": "glaucoma"
 }
-selected_pathology_label = st.selectbox("Choisissez la pathologie à détecter :", list(pathology_options.keys()))
-model_type = pathology_options[selected_pathology_label]
+
+col1, col2 = st.columns([2, 1])
+
+with col1:
+    selected_pathology_label = st.selectbox("Choisissez la pathologie à détecter :", list(pathology_options.keys()))
+    model_type = pathology_options[selected_pathology_label]
+
+with col2:
+    st.write("")  # Alignement
+    show_gradcam = st.checkbox("🔍 Afficher Grad-CAM", value=False)
 
 uploaded_file = st.file_uploader("Choisissez une image de fond d'œil...", type=["jpg", "png", "jpeg"])
 
 if uploaded_file is not None:
-    image = Image.open(uploaded_file)
-    st.image(image, caption="Image téléchargée.", use_column_width=True)
+    # Affichage original
+    col1, col2 = st.columns(2)
+    
+    with col1:
+        image = Image.open(uploaded_file)
+        st.image(image, caption="Image téléchargée", use_column_width=True)
+    
+    # Bouton diagnostic
+    if st.button("🔬 Lancer le diagnostic", use_container_width=True):
+        with st.spinner("Analyse en cours..."):
+            # Convertir l'image en bytes
+            buf = io.BytesIO()
+            image.save(buf, format='PNG')
+            byte_im = buf.getvalue()
 
-    if st.button("Lancer le diagnostic"):
-        st.write("Envoi de l'image pour le diagnostic...")
+            # Adresse de l'API backend
+            backend_url_predict = 'http://backend:5000/predict'
+            backend_url_gradcam = 'http://backend:5000/predict_with_gradcam'
+            
+            multipart_payload = {
+                'file': ('image.png', byte_im, 'image/png'),
+                'model_type': (None, model_type)
+            }
 
-        # Convertir l'image en bytes pour l'envoyer à l'API
-        buf = io.BytesIO()
-        image.save(buf, format='PNG')
-        byte_im = buf.getvalue()
-
-        # Adresse de l'API backend
-        backend_url = 'http://backend:5000/predict'
-        
-        # Correction : Envoyer les champs de formulaire et le fichier
-        # dans le même dictionnaire 'files'.
-        # Pour les champs non-fichier, on utilise un tuple (None, value).
-        multipart_payload = {
-            'file': ('image.png', byte_im, 'image/png'),
-            'model_type': (None, model_type)
-        }
-
-        try:
-            response = requests.post(backend_url, files=multipart_payload)
-            if response.status_code == 200:
-                st.success(f"Diagnostic : {response.json()}")
-            else:
-                st.error(f"Erreur du backend : {response.status_code} - {response.text}")
-        except requests.exceptions.RequestException as e:
-            st.error(f"Erreur de connexion au backend : {e}")
-
+            try:
+                # Prédiction avec ou sans Grad-CAM
+                if show_gradcam:
+                    response = requests.post(backend_url_gradcam, files=multipart_payload)
+                else:
+                    response = requests.post(backend_url_predict, files=multipart_payload)
+                
+                if response.status_code == 200:
+                    result = response.json()
+                    
+                    # Affichage du résultat
+                    with col2:
+                        st.markdown("### 📋 Résultat")
+                        
+                        # Classe
+                        prediction = result.get("prediction_class", "Erreur")
+                        if prediction == 0:
+                            st.success(f"Classe: {prediction} (NÉGATIF)")
+                        else:
+                            st.error(f"Classe: {prediction} (POSITIF)")
+                        
+                        # Recommandation
+                        recommendation = result.get("recommendation", "")
+                        st.info(recommendation)
+                        
+                        # Probabilité
+                        prob = result.get("probability", 0)
+                        st.metric("Confiance", f"{prob*100:.2f}%")
+                    
+                    # Affichage Grad-CAM si activé
+                    if show_gradcam and 'heatmap' in result:
+                        st.markdown("---")
+                        st.markdown("### 🔥 Heatmap Grad-CAM")
+                        st.markdown("*Zones d'intérêt identifiées par le modèle (rouge = important)*")
+                        
+                        # Décoder l'image base64
+                        heatmap_base64 = result['heatmap']
+                        image_data = base64.b64decode(heatmap_base64.split(',')[1])
+                        heatmap_image = Image.open(io.BytesIO(image_data))
+                        st.image(heatmap_image, caption="Zones d'intérêt détectées", use_column_width=True)
+                        
+                        # Explication
+                        st.caption("""
+                        **Interprétation:**
+                        - 🔴 **Rouge** : Zones très importantes pour la décision
+                        - 🟡 **Orange** : Zones moyennement importantes
+                        - 🟢 **Vert** : Zones moins importantes
+                        """)
+                    
+                    # Détails supplémentaires (multiclass pour RD)
+                    if model_type == 'rd' and 'all_probabilities' in result:
+                        with st.expander("📊 Détails multiclass (RD)"):
+                            probs = result['all_probabilities']
+                            st.write({
+                                'Aucune': f"{probs['class_0_aucune']*100:.1f}%",
+                                'Légère': f"{probs['class_1_legere']*100:.1f}%",
+                                'Modérée': f"{probs['class_2_moderee']*100:.1f}%",
+                                'Sévère': f"{probs['class_3_severe']*100:.1f}%",
+                                'Proliférative': f"{probs['class_4_proliferative']*100:.1f}%"
+                            })
+                
+                else:
+                    st.error(f"Erreur du backend: {response.status_code}")
+                    st.write(response.text)
+            
+            except requests.exceptions.RequestException as e:
+                st.error(f"❌ Erreur de connexion au backend: {e}")
