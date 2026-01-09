@@ -53,7 +53,7 @@ services:
     depends_on:
       - mongo
     networks:
-      - ophtia-net
+      - ophtia-net  
     restart: always
 
   # RabbitMQ - Message Broker
@@ -159,8 +159,10 @@ services:
     networks:
       - ophtia-net
     depends_on:
-      - rabbitmq
-      - mongo
+      rabbitmq:
+        condition: service_healthy
+      mongo:
+        condition: service_started
     restart: always
     healthcheck:
       test: ["CMD", "ps", "aux"]

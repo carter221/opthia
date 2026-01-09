@@ -30,6 +30,79 @@ logging.basicConfig(
 )
 logger = logging.getLogger(__name__)
 
+
+# ========== CLASSE GRADCAM ==========
+class GradCAM:
+    """Génère les heatmaps Grad-CAM pour l'explicabilité."""
+    def __init__(self, model, target_layer):
+        self.model = model
+        self.target_layer = target_layer
+        self.gradients = None
+        self.activations = None
+        
+        # Register hooks
+        target_layer.register_forward_hook(self._forward_hook)
+        target_layer.register_backward_hook(self._backward_hook)
+    
+    def _forward_hook(self, module, input, output):
+        self.activations = output.detach()
+    
+    def _backward_hook(self, module, grad_input, grad_output):
+        self.gradients = grad_output[0].detach()
+    
+    def generate_cam(self, x):
+        # Forward pass
+        self.model.zero_grad()
+        output = self.model(x)
+        
+        if isinstance(output, tuple):
+            output = output[0]
+        
+        # Backward pass
+        score = output.max()
+        self.model.zero_grad()
+        score.backward()
+        
+        # Compute CAM
+        if self.gradients is None or self.activations is None:
+            # Fallback: create a simple heatmap
+            return np.ones((512, 512), dtype=np.float32) * 0.5
+        
+        gradients = self.gradients[0].cpu().numpy()
+        activations = self.activations[0].cpu().numpy()
+        
+        weights = gradients.mean(axis=(1, 2))
+        cam = np.zeros(activations.shape[1:], dtype=np.float32)
+        
+        for i, w in enumerate(weights):
+            cam += w * activations[i, :, :]
+        
+        cam = np.maximum(cam, 0)
+        cam = cv2.resize(cam, (512, 512))
+        cam = (cam - cam.min()) / (cam.max() - cam.min() + 1e-8)
+        
+        return cam
+
+
+def apply_heatmap_to_image(image, cam, alpha=0.5, resize_to=None):
+    """Applique la heatmap Grad-CAM sur une image."""
+    if resize_to:
+        image = cv2.resize(image, resize_to)
+    
+    heatmap = cv2.applyColorMap((cam * 255).astype(np.uint8), cv2.COLORMAP_JET)
+    heatmap = cv2.resize(heatmap, (image.shape[1], image.shape[0]))
+    
+    result = cv2.addWeighted(image, 1 - alpha, heatmap, alpha, 0)
+    return result
+
+
+def encode_image_to_base64(image):
+    """Encode une image en base64."""
+    success, buffer = cv2.imencode('.jpg', image, [cv2.IMWRITE_JPEG_QUALITY, 95])
+    base64_str = base64.b64encode(buffer).decode('utf-8')
+    return f"data:image/jpeg;base64,{base64_str}"
+
+
 # Singleton pour les modèles et DB
 models_cache = {}
 db = None
@@ -209,6 +282,22 @@ def process_diagnostic_task(task_data):
         
         # Prédiction
         model = models_cache[model_type]
+        
+        # Générer Grad-CAM
+        try:
+            if model_type == 'rd':
+                target_layer = model.layer4
+            else:
+                target_layer = model.features[-1]
+            
+            gradcam = GradCAM(model, target_layer)
+            cam = gradcam.generate_cam(input_tensor)
+            heatmap_image = apply_heatmap_to_image(image_np, cam, alpha=0.5, resize_to=(256, 256))
+            grad_cam_base64 = encode_image_to_base64(heatmap_image)
+        except Exception as e:
+            logger.warning(f"Grad-CAM non généré: {e}")
+            grad_cam_base64 = None
+        
         with torch.no_grad():
             output = model(input_tensor)
             
@@ -217,8 +306,7 @@ def process_diagnostic_task(task_data):
                 prediction_multiclass = torch.argmax(probabilities, dim=1).item()
                 prediction_binary = 0 if prediction_multiclass == 0 else 1
                 
-                result = {
-                    'task_id': task_id,
+                result_data = {
                     'prediction_class': int(prediction_binary),
                     'prediction_multiclass': int(prediction_multiclass),
                     'probability': float(probabilities[0, 0].item()),
@@ -230,6 +318,12 @@ def process_diagnostic_task(task_data):
                         'class_4': float(probabilities[0, 4].item()),
                     },
                     'recommendation': "⚠️ RÉTINOPATHIE DÉTECTÉE" if prediction_binary == 1 else "✅ Aucune RD",
+                    'grad_cam': grad_cam_base64,
+                }
+                
+                result = {
+                    'task_id': task_id,
+                    'result': result_data,
                     'model_type': model_type,
                     'status': 'completed',
                     'filename': filename,
@@ -239,11 +333,16 @@ def process_diagnostic_task(task_data):
                 probability = torch.sigmoid(output).item()
                 prediction = 1 if probability > 0.5 else 0
                 
-                result = {
-                    'task_id': task_id,
+                result_data = {
                     'prediction_class': int(prediction),
                     'probability': probability,
                     'recommendation': "⚠️ GLAUCOME DÉTECTÉ" if prediction == 1 else "✅ Aucun glaucome",
+                    'grad_cam': grad_cam_base64,
+                }
+                
+                result = {
+                    'task_id': task_id,
+                    'result': result_data,
                     'model_type': model_type,
                     'status': 'completed',
                     'filename': filename,
@@ -251,7 +350,7 @@ def process_diagnostic_task(task_data):
                 }
         
         # Sauvegarde MongoDB
-        if db:
+        if db is not None:
             db.diagnostic_results.insert_one(result)
             logger.info(f"✓ Diagnostic sauvegardé: {task_id}")
         
@@ -259,7 +358,7 @@ def process_diagnostic_task(task_data):
         
     except Exception as e:
         logger.error(f"✗ Erreur diagnostic: {e}")
-        if db:
+        if db is not None:
             db.diagnostic_results.insert_one({
                 'task_id': task_id,
                 'status': 'failed',

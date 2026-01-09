@@ -64,19 +64,24 @@ def init_rabbitmq():
 
 def publish_task(queue_name, task_data):
     """Publie une tâche dans RabbitMQ."""
-    if rabbitmq_channel:
-        try:
-            rabbitmq_channel.basic_publish(
-                exchange='',
-                routing_key=queue_name,
-                body=json.dumps(task_data),
-                properties=pika.BasicProperties(delivery_mode=2)  # Persistent
-            )
-            return True
-        except Exception as e:
-            print(f"Erreur publication RabbitMQ: {e}")
-            return False
-    return False
+    try:
+        rabbitmq_url = os.environ.get('RABBITMQ_URL', 'amqp://guest:guest@rabbitmq:5672/%2F')
+        connection = pika.BlockingConnection(pika.URLParameters(rabbitmq_url))
+        channel = connection.channel()
+        channel.queue_declare(queue=queue_name, durable=True)
+        
+        channel.basic_publish(
+            exchange='',
+            routing_key=queue_name,
+            body=json.dumps(task_data),
+            properties=pika.BasicProperties(delivery_mode=2)  # Persistent
+        )
+        connection.close()
+        print(f"[✓] Tâche publiée dans {queue_name}")
+        return True
+    except Exception as e:
+        print(f"[✗] Erreur publication RabbitMQ: {e}")
+        return False
 
 def init_connections():
     """Initialise la connexion à la base de données et charge les modèles."""
@@ -188,301 +193,62 @@ def load_models():
 def index():
     return "Backend de diagnostic ophtalmologique est en cours d'exécution!"
 
-@app.route('/predict', methods=['POST'])
-def predict():
-    if 'file' not in request.files:
-        return jsonify({'error': 'Aucun fichier fourni'}), 400
-
-    file = request.files['file']
-    model_type = request.form.get('model_type')
-
-    if not model_type or model_type not in models_cache:
-        return jsonify({'error': f"Type de modèle '{model_type}' non valide ou non chargé"}), 400
-
-    try:
-        image_bytes = file.read()
-        image = Image.open(io.BytesIO(image_bytes)).convert('RGB')
-        image_np = np.array(image)
-        
-        # TRAITEMENT DIFFÉRENCIÉ PAR MODÈLE
-        if model_type == 'rd':
-            # ========== PIPELINE RÉTINOPATHIE DIABÉTIQUE ==========
-            # Traitement MINIMAL pour ne pas dégrader la qualité
-            # Note: Le modèle a été entraîné avec un pipeline spécifique
-            # Crop très léger pour enlever juste les bordures extrêmes
-            image_np_processed = crop_image_from_gray(image_np, tol=10)
-            
-            # PAS de CLAHE - le modèle préfère les images brutes
-            # (Peut augmenter l'accuracy en étant conservateur)
-            
-            # Resize à 512x512
-            image_np_processed = cv2.resize(image_np_processed, (512, 512))
-            image_np = image_np_processed
-            
-        elif model_type == 'glaucoma':
-            # ========== PIPELINE GLAUCOME ==========
-            # Pas de crop ni CLAHE pour le glaucome
-            # Juste convertir en PIL pour les transformations torchvision
-            image = Image.fromarray(image_np)
-        
-        # Récupérer le modèle et device
-        model = models_cache[model_type]
-        device = models_cache['device']
-        
-        # Appliquer les transformations
-        transforms_pipeline = get_prediction_transforms(model_type)
-        
-        if model_type == 'rd':
-            # Albumentations pour RD
-            transformed = transforms_pipeline(image=image_np)
-            processed_image = transformed['image']
-        else:
-            # Torchvision pour Glaucome
-            processed_image = transforms_pipeline(image)
-        
-        # Ajouter dimension batch
-        if processed_image.dim() == 3:
-            input_tensor = processed_image.unsqueeze(0).to(device)
-        else:
-            input_tensor = processed_image.to(device)
-
-        # Prédiction avec le modèle
-        with torch.no_grad():
-            output = model(input_tensor)
-            
-            if model_type == 'rd':
-                # ===== BINAIRE pour RD (transformation multiclasse -> binaire) =====
-                # Classe 0: Pas de RD (négatif)
-                # Classes 1-4: RD détectée (positif)
-                probabilities = torch.softmax(output, dim=1)
-                prediction_multiclass = torch.argmax(probabilities, dim=1).item()
-                
-                # Convertir en binaire: 0 = pas de RD, 1 = RD détectée
-                prediction_binary = 0 if prediction_multiclass == 0 else 1
-                probability_rd = float(probabilities[0, 0].item())  # Probabilité de classe 0 (pas de RD)
-                
-                # Recommandation
-                if prediction_binary == 1:
-                    recommendation = "⚠️ RÉTINOPATHIE DIABÉTIQUE DÉTECTÉE - Veuillez consulter un médecin pour un examen complet"
-                else:
-                    recommendation = "✅ Aucune rétinopathie diabétique détectée"
-                
-                diagnostic_record = {
-                    'model_used': model_type,
-                    'prediction_class': int(prediction_binary),  # 0=pas de RD, 1=RD détectée
-                    'prediction_multiclass': int(prediction_multiclass),  # 0-4 pour info
-                    'probability': probability_rd,  # Confiance de "pas de RD"
-                    'all_probabilities': {
-                        'class_0_aucune': float(probabilities[0, 0].item()),
-                        'class_1_legere': float(probabilities[0, 1].item()),
-                        'class_2_moderee': float(probabilities[0, 2].item()),
-                        'class_3_severe': float(probabilities[0, 3].item()),
-                        'class_4_proliferative': float(probabilities[0, 4].item())
-                    },
-                    'recommendation': recommendation,
-                    'image_filename': file.filename,
-                    'timestamp': datetime.utcnow()
-                }
-            else:
-                # ===== BINAIRE pour Glaucome =====
-                # 0=normal, 1=glaucome
-                probability = torch.sigmoid(output).item()
-                prediction = 1 if probability > 0.5 else 0
-                
-                # Recommandation
-                if prediction == 1:
-                    recommendation = "⚠️ GLAUCOME DÉTECTÉ - Veuillez consulter un médecin pour un examen complet"
-                else:
-                    recommendation = "✅ Aucun glaucome détecté"
-                
-                diagnostic_record = {
-                    'model_used': model_type,
-                    'prediction_class': int(prediction),  # 0 ou 1
-                    'probability': probability,
-                    'recommendation': recommendation,
-                    'image_filename': file.filename,
-                    'timestamp': datetime.utcnow()
-                }
-
-        # Sauvegarde dans MongoDB
-        if db is not None:
-            db.diagnostics.insert_one(diagnostic_record)
-        
-        # Le résultat JSON ne contient pas l'ID de la base de données pour le frontend
-        result_for_frontend = diagnostic_record.copy()
-        del result_for_frontend['_id'] # L'objet ObjectId n'est pas sérialisable en JSON
-        
-        return jsonify(result_for_frontend)
-
-    except Exception as e:
-        return jsonify({'error': f"Erreur lors de la prédiction : {str(e)}"}), 500
-
 @app.route('/predict_with_gradcam', methods=['POST'])
 def predict_with_gradcam():
-    """Prédiction avec Grad-CAM pour l'explicabilité."""
-    if 'file' not in request.files:
-        return jsonify({'error': 'Aucun fichier fourni'}), 400
-
-    file = request.files['file']
-    model_type = request.form.get('model_type')
-
-    if not model_type or model_type not in models_cache:
-        return jsonify({'error': f"Type de modèle '{model_type}' non valide ou non chargé"}), 400
-
-    try:
-        image_bytes = file.read()
-        image = Image.open(io.BytesIO(image_bytes)).convert('RGB')
-        image_np = np.array(image)
-        original_image = image_np.copy()
-        
-        # TRAITEMENT DIFFÉRENCIÉ PAR MODÈLE (même logique que /predict)
-        if model_type == 'rd':
-            image_np_processed = crop_image_from_gray(image_np, tol=10)
-            image_np_processed = cv2.resize(image_np_processed, (512, 512))
-            image_np = image_np_processed
-        
-        # Récupérer le modèle et device
-        model = models_cache[model_type]
-        device = models_cache['device']
-        
-        # Appliquer les transformations
-        transforms_pipeline = get_prediction_transforms(model_type)
-        
-        if model_type == 'rd':
-            transformed = transforms_pipeline(image=image_np)
-            processed_image = transformed['image']
-        else:
-            processed_image = transforms_pipeline(Image.fromarray(image_np))
-        
-        # Ajouter dimension batch
-        if processed_image.dim() == 3:
-            input_tensor = processed_image.unsqueeze(0).to(device)
-        else:
-            input_tensor = processed_image.to(device)
-        
-        # Sélectionner la couche cible pour Grad-CAM
-        if model_type == 'rd':
-            target_layer = model.layer4
-        else:
-            target_layer = model.features[-1]
-        
-        # Génération Grad-CAM
-        gradcam = GradCAM(model, target_layer)
-        cam = gradcam.generate_cam(input_tensor)
-        
-        # Superposition heatmap sur l'image processée (réduite à 50% pour optimiser la taille)
-        heatmap_image = apply_heatmap_to_image(image_np, cam, alpha=0.5, resize_to=(256, 256))
-        heatmap_base64 = encode_image_to_base64(heatmap_image)
-        
-        # Prédiction (même logique que /predict)
-        with torch.no_grad():
-            output = model(input_tensor)
-            
-            if model_type == 'rd':
-                probabilities = torch.softmax(output, dim=1)
-                prediction_multiclass = torch.argmax(probabilities, dim=1).item()
-                prediction_binary = 0 if prediction_multiclass == 0 else 1
-                probability_rd = float(probabilities[0, 0].item())
-                
-                if prediction_binary == 1:
-                    recommendation = "⚠️ RÉTINOPATHIE DIABÉTIQUE DÉTECTÉE - Veuillez consulter un médecin pour un examen complet"
-                else:
-                    recommendation = "✅ Aucune rétinopathie diabétique détectée"
-                
-                result = {
-                    'prediction_class': int(prediction_binary),
-                    'prediction_multiclass': int(prediction_multiclass),
-                    'probability': probability_rd,
-                    'recommendation': recommendation,
-                    'heatmap': heatmap_base64,
-                    'all_probabilities': {
-                        'class_0_aucune': float(probabilities[0, 0].item()),
-                        'class_1_legere': float(probabilities[0, 1].item()),
-                        'class_2_moderee': float(probabilities[0, 2].item()),
-                        'class_3_severe': float(probabilities[0, 3].item()),
-                        'class_4_proliferative': float(probabilities[0, 4].item())
-                    }
-                }
-            else:
-                probability = torch.sigmoid(output).item()
-                prediction = 1 if probability > 0.5 else 0
-                
-                if prediction == 1:
-                    recommendation = "⚠️ GLAUCOME DÉTECTÉ - Veuillez consulter un médecin pour un examen complet"
-                else:
-                    recommendation = "✅ Aucun glaucome détecté"
-                
-                result = {
-                    'prediction_class': int(prediction),
-                    'probability': probability,
-                    'recommendation': recommendation,
-                    'heatmap': heatmap_base64
-                }
-        
-        return jsonify(result)
-
-    except Exception as e:
-        return jsonify({'error': f"Erreur lors de la prédiction Grad-CAM : {str(e)}"}), 500
-
-@app.route('/predict_async', methods=['POST'])
-def predict_async():
     """
-    Endpoint asynchrone qui déclenche une tâche Airflow.
-    Retourne task_id pour polling.
+    Endpoint qui envoie la tâche de diagnostic au worker RabbitMQ.
+    Retourne une task_id pour polling des résultats.
     """
     if 'file' not in request.files:
         return jsonify({'error': 'Aucun fichier fourni'}), 400
 
     file = request.files['file']
-    model_type = request.form.get('model_type')
+    model_type = request.form.get('model_type', 'rd')
 
-    if not model_type or model_type not in models_cache:
-        return jsonify({'error': f"Type de modèle '{model_type}' non valide"}), 400
+    if model_type not in ['rd', 'glaucoma']:
+        return jsonify({'error': 'model_type doit être "rd" ou "glaucoma"'}), 400
 
     try:
         # Génération ID unique
         task_id = str(uuid.uuid4())
         
-        # Lecture l'image en base64
+        # Encodage image en base64
         image_bytes = file.read()
         image_base64 = "data:image/png;base64," + __import__('base64').b64encode(image_bytes).decode('utf-8')
         
-        # Déclencher DAG Airflow
-        import requests
-        airflow_api = os.environ.get('AIRFLOW_API_URL', 'http://airflow-webserver:8080/api/v1')
-        
-        dag_run_config = {
+        # Préparer la tâche
+        task_data = {
             'task_id': task_id,
             'image_base64': image_base64,
             'model_type': model_type,
             'filename': file.filename
         }
         
-        response = requests.post(
-            f"{airflow_api}/dags/diagnostic_pipeline/dagRuns",
-            json={'conf': dag_run_config},
-            auth=('airflow', 'airflow'),
-            timeout=10
-        )
+        # Envoyer à RabbitMQ
+        queue = 'diagnostic_tasks'
+        published = publish_task(queue, task_data)
         
-        if response.status_code in [200, 201]:
+        if published:
             return jsonify({
+                'status': 'submitted',
                 'task_id': task_id,
-                'status': 'pending',
-                'poll_url': f'/result/{task_id}',
-                'message': 'Tâche envoyée à Airflow. Utilisez poll_url pour obtenir le résultat'
+                'message': 'Diagnostic en cours de traitement avec Grad-CAM...',
+                'poll_url': f'/result/{task_id}'
             }), 202
         else:
-            return jsonify({'error': f'Erreur Airflow: {response.text}'}), 500
-    
+            return jsonify({'error': 'Impossible de soumettre la tâche'}), 500
+            
     except Exception as e:
-        return jsonify({'error': f"Erreur lors du déclenchement Airflow : {str(e)}"}), 500
+        print(f"[✗] Erreur endpoint /predict_with_gradcam: {e}")
+        return jsonify({'error': f"Erreur : {str(e)}"}), 500
+
+        return jsonify({'error': f"Erreur lors de la prédiction Grad-CAM : {str(e)}"}), 500
 
 @app.route('/result/<task_id>', methods=['GET'])
 def get_result(task_id):
     """Récupère le résultat d'une tâche Airflow via MongoDB."""
     try:
-        if not db:
+        if db is None:
             return jsonify({'error': 'Connexion MongoDB non disponible'}), 503
         
         result = db.diagnostic_results.find_one({'task_id': task_id})
