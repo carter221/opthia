@@ -306,10 +306,16 @@ def process_diagnostic_task(task_data):
                 prediction_multiclass = torch.argmax(probabilities, dim=1).item()
                 prediction_binary = 0 if prediction_multiclass == 0 else 1
                 
+                # Afficher la probabilité de la classe prédite (pas toujours classe 0)
+                if prediction_binary == 0:
+                    confidence = float(probabilities[0, 0].item())
+                else:
+                    confidence = float(probabilities[0, prediction_multiclass].item())
+                
                 result_data = {
                     'prediction_class': int(prediction_binary),
                     'prediction_multiclass': int(prediction_multiclass),
-                    'probability': float(probabilities[0, 0].item()),
+                    'probability': confidence,
                     'all_probabilities': {
                         'class_0': float(probabilities[0, 0].item()),
                         'class_1': float(probabilities[0, 1].item()),

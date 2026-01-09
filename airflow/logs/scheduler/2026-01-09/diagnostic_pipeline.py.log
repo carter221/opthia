@@ -1248,3 +1248,490 @@ Please take a look at these docs to improve your DAG import time:
 [2026-01-09T15:37:11.749+0000] {processor.py:157} INFO - Started process (PID=2247) to work on /opt/airflow/dags/diagnostic_pipeline.py
 [2026-01-09T15:37:11.755+0000] {processor.py:829} INFO - Processing file /opt/airflow/dags/diagnostic_pipeline.py for tasks to queue
 [2026-01-09T15:37:11.773+0000] {logging_mixin.py:154} INFO - [2026-01-09T15:37:11.767+0000] {dagbag.py:536} INFO - Filling up the DagBag from /opt/airflow/dags/diagnostic_pipeline.py
+[2026-01-09T15:37:23.977+0000] {processor.py:839} INFO - DAG(s) dict_keys(['diagnostic_pipeline']) retrieved from /opt/airflow/dags/diagnostic_pipeline.py
+[2026-01-09T15:37:24.053+0000] {logging_mixin.py:154} INFO - [2026-01-09T15:37:24.051+0000] {dag.py:2941} INFO - Sync 1 DAGs
+[2026-01-09T15:37:24.087+0000] {logging_mixin.py:154} INFO - [2026-01-09T15:37:24.086+0000] {dag.py:3722} INFO - Setting next_dagrun for diagnostic_pipeline to None, run_after=None
+[2026-01-09T15:37:24.145+0000] {processor.py:179} INFO - Processing /opt/airflow/dags/diagnostic_pipeline.py took 12.432 seconds
+[2026-01-09T15:37:54.472+0000] {processor.py:157} INFO - Started process (PID=2270) to work on /opt/airflow/dags/diagnostic_pipeline.py
+[2026-01-09T15:37:54.473+0000] {processor.py:829} INFO - Processing file /opt/airflow/dags/diagnostic_pipeline.py for tasks to queue
+[2026-01-09T15:37:54.474+0000] {logging_mixin.py:154} INFO - [2026-01-09T15:37:54.474+0000] {dagbag.py:536} INFO - Filling up the DagBag from /opt/airflow/dags/diagnostic_pipeline.py
+[2026-01-09T15:37:59.666+0000] {processor.py:839} INFO - DAG(s) dict_keys(['diagnostic_pipeline']) retrieved from /opt/airflow/dags/diagnostic_pipeline.py
+[2026-01-09T15:37:59.748+0000] {logging_mixin.py:154} INFO - [2026-01-09T15:37:59.747+0000] {dag.py:2941} INFO - Sync 1 DAGs
+[2026-01-09T15:37:59.782+0000] {logging_mixin.py:154} INFO - [2026-01-09T15:37:59.781+0000] {dag.py:3722} INFO - Setting next_dagrun for diagnostic_pipeline to None, run_after=None
+[2026-01-09T15:37:59.847+0000] {processor.py:179} INFO - Processing /opt/airflow/dags/diagnostic_pipeline.py took 5.378 seconds
+[2026-01-09T15:38:30.551+0000] {processor.py:157} INFO - Started process (PID=2288) to work on /opt/airflow/dags/diagnostic_pipeline.py
+[2026-01-09T15:38:30.553+0000] {processor.py:829} INFO - Processing file /opt/airflow/dags/diagnostic_pipeline.py for tasks to queue
+[2026-01-09T15:38:30.555+0000] {logging_mixin.py:154} INFO - [2026-01-09T15:38:30.554+0000] {dagbag.py:536} INFO - Filling up the DagBag from /opt/airflow/dags/diagnostic_pipeline.py
+[2026-01-09T15:38:36.179+0000] {processor.py:839} INFO - DAG(s) dict_keys(['diagnostic_pipeline']) retrieved from /opt/airflow/dags/diagnostic_pipeline.py
+[2026-01-09T15:38:36.220+0000] {logging_mixin.py:154} INFO - [2026-01-09T15:38:36.219+0000] {dag.py:2941} INFO - Sync 1 DAGs
+[2026-01-09T15:38:36.302+0000] {logging_mixin.py:154} INFO - [2026-01-09T15:38:36.301+0000] {dag.py:3722} INFO - Setting next_dagrun for diagnostic_pipeline to None, run_after=None
+[2026-01-09T15:38:36.327+0000] {processor.py:179} INFO - Processing /opt/airflow/dags/diagnostic_pipeline.py took 5.782 seconds
+[2026-01-09T15:39:06.609+0000] {processor.py:157} INFO - Started process (PID=2306) to work on /opt/airflow/dags/diagnostic_pipeline.py
+[2026-01-09T15:39:06.645+0000] {processor.py:829} INFO - Processing file /opt/airflow/dags/diagnostic_pipeline.py for tasks to queue
+[2026-01-09T15:39:06.649+0000] {logging_mixin.py:154} INFO - [2026-01-09T15:39:06.648+0000] {dagbag.py:536} INFO - Filling up the DagBag from /opt/airflow/dags/diagnostic_pipeline.py
+[2026-01-09T15:39:12.607+0000] {processor.py:839} INFO - DAG(s) dict_keys(['diagnostic_pipeline']) retrieved from /opt/airflow/dags/diagnostic_pipeline.py
+[2026-01-09T15:39:12.684+0000] {logging_mixin.py:154} INFO - [2026-01-09T15:39:12.682+0000] {dag.py:2941} INFO - Sync 1 DAGs
+[2026-01-09T15:39:12.721+0000] {logging_mixin.py:154} INFO - [2026-01-09T15:39:12.720+0000] {dag.py:3722} INFO - Setting next_dagrun for diagnostic_pipeline to None, run_after=None
+[2026-01-09T15:39:12.766+0000] {processor.py:179} INFO - Processing /opt/airflow/dags/diagnostic_pipeline.py took 6.170 seconds
+[2026-01-09T15:39:43.123+0000] {processor.py:157} INFO - Started process (PID=2324) to work on /opt/airflow/dags/diagnostic_pipeline.py
+[2026-01-09T15:39:43.124+0000] {processor.py:829} INFO - Processing file /opt/airflow/dags/diagnostic_pipeline.py for tasks to queue
+[2026-01-09T15:39:43.126+0000] {logging_mixin.py:154} INFO - [2026-01-09T15:39:43.125+0000] {dagbag.py:536} INFO - Filling up the DagBag from /opt/airflow/dags/diagnostic_pipeline.py
+[2026-01-09T15:39:46.391+0000] {processor.py:839} INFO - DAG(s) dict_keys(['diagnostic_pipeline']) retrieved from /opt/airflow/dags/diagnostic_pipeline.py
+[2026-01-09T15:39:46.427+0000] {logging_mixin.py:154} INFO - [2026-01-09T15:39:46.427+0000] {dag.py:2941} INFO - Sync 1 DAGs
+[2026-01-09T15:39:46.447+0000] {logging_mixin.py:154} INFO - [2026-01-09T15:39:46.447+0000] {dag.py:3722} INFO - Setting next_dagrun for diagnostic_pipeline to None, run_after=None
+[2026-01-09T15:39:46.471+0000] {processor.py:179} INFO - Processing /opt/airflow/dags/diagnostic_pipeline.py took 3.353 seconds
+[2026-01-09T15:40:16.804+0000] {processor.py:157} INFO - Started process (PID=2342) to work on /opt/airflow/dags/diagnostic_pipeline.py
+[2026-01-09T15:40:16.805+0000] {processor.py:829} INFO - Processing file /opt/airflow/dags/diagnostic_pipeline.py for tasks to queue
+[2026-01-09T15:40:16.807+0000] {logging_mixin.py:154} INFO - [2026-01-09T15:40:16.806+0000] {dagbag.py:536} INFO - Filling up the DagBag from /opt/airflow/dags/diagnostic_pipeline.py
+[2026-01-09T15:40:21.023+0000] {processor.py:839} INFO - DAG(s) dict_keys(['diagnostic_pipeline']) retrieved from /opt/airflow/dags/diagnostic_pipeline.py
+[2026-01-09T15:40:21.101+0000] {logging_mixin.py:154} INFO - [2026-01-09T15:40:21.098+0000] {dag.py:2941} INFO - Sync 1 DAGs
+[2026-01-09T15:40:21.129+0000] {logging_mixin.py:154} INFO - [2026-01-09T15:40:21.129+0000] {dag.py:3722} INFO - Setting next_dagrun for diagnostic_pipeline to None, run_after=None
+[2026-01-09T15:40:21.160+0000] {processor.py:179} INFO - Processing /opt/airflow/dags/diagnostic_pipeline.py took 4.361 seconds
+[2026-01-09T15:40:51.460+0000] {processor.py:157} INFO - Started process (PID=2363) to work on /opt/airflow/dags/diagnostic_pipeline.py
+[2026-01-09T15:40:51.462+0000] {processor.py:829} INFO - Processing file /opt/airflow/dags/diagnostic_pipeline.py for tasks to queue
+[2026-01-09T15:40:51.464+0000] {logging_mixin.py:154} INFO - [2026-01-09T15:40:51.463+0000] {dagbag.py:536} INFO - Filling up the DagBag from /opt/airflow/dags/diagnostic_pipeline.py
+[2026-01-09T15:40:55.215+0000] {processor.py:839} INFO - DAG(s) dict_keys(['diagnostic_pipeline']) retrieved from /opt/airflow/dags/diagnostic_pipeline.py
+[2026-01-09T15:40:55.248+0000] {logging_mixin.py:154} INFO - [2026-01-09T15:40:55.247+0000] {dag.py:2941} INFO - Sync 1 DAGs
+[2026-01-09T15:40:55.264+0000] {logging_mixin.py:154} INFO - [2026-01-09T15:40:55.264+0000] {dag.py:3722} INFO - Setting next_dagrun for diagnostic_pipeline to None, run_after=None
+[2026-01-09T15:40:55.289+0000] {processor.py:179} INFO - Processing /opt/airflow/dags/diagnostic_pipeline.py took 3.839 seconds
+[2026-01-09T15:41:26.137+0000] {processor.py:157} INFO - Started process (PID=2383) to work on /opt/airflow/dags/diagnostic_pipeline.py
+[2026-01-09T15:41:26.138+0000] {processor.py:829} INFO - Processing file /opt/airflow/dags/diagnostic_pipeline.py for tasks to queue
+[2026-01-09T15:41:26.139+0000] {logging_mixin.py:154} INFO - [2026-01-09T15:41:26.139+0000] {dagbag.py:536} INFO - Filling up the DagBag from /opt/airflow/dags/diagnostic_pipeline.py
+[2026-01-09T15:41:29.336+0000] {processor.py:839} INFO - DAG(s) dict_keys(['diagnostic_pipeline']) retrieved from /opt/airflow/dags/diagnostic_pipeline.py
+[2026-01-09T15:41:29.371+0000] {logging_mixin.py:154} INFO - [2026-01-09T15:41:29.369+0000] {dag.py:2941} INFO - Sync 1 DAGs
+[2026-01-09T15:41:29.387+0000] {logging_mixin.py:154} INFO - [2026-01-09T15:41:29.387+0000] {dag.py:3722} INFO - Setting next_dagrun for diagnostic_pipeline to None, run_after=None
+[2026-01-09T15:41:29.409+0000] {processor.py:179} INFO - Processing /opt/airflow/dags/diagnostic_pipeline.py took 3.277 seconds
+[2026-01-09T15:41:59.687+0000] {processor.py:157} INFO - Started process (PID=2401) to work on /opt/airflow/dags/diagnostic_pipeline.py
+[2026-01-09T15:41:59.689+0000] {processor.py:829} INFO - Processing file /opt/airflow/dags/diagnostic_pipeline.py for tasks to queue
+[2026-01-09T15:41:59.692+0000] {logging_mixin.py:154} INFO - [2026-01-09T15:41:59.691+0000] {dagbag.py:536} INFO - Filling up the DagBag from /opt/airflow/dags/diagnostic_pipeline.py
+[2026-01-09T15:42:03.065+0000] {processor.py:839} INFO - DAG(s) dict_keys(['diagnostic_pipeline']) retrieved from /opt/airflow/dags/diagnostic_pipeline.py
+[2026-01-09T15:42:03.106+0000] {logging_mixin.py:154} INFO - [2026-01-09T15:42:03.105+0000] {dag.py:2941} INFO - Sync 1 DAGs
+[2026-01-09T15:42:03.124+0000] {logging_mixin.py:154} INFO - [2026-01-09T15:42:03.124+0000] {dag.py:3722} INFO - Setting next_dagrun for diagnostic_pipeline to None, run_after=None
+[2026-01-09T15:42:03.147+0000] {processor.py:179} INFO - Processing /opt/airflow/dags/diagnostic_pipeline.py took 3.466 seconds
+[2026-01-09T15:42:33.270+0000] {processor.py:157} INFO - Started process (PID=2419) to work on /opt/airflow/dags/diagnostic_pipeline.py
+[2026-01-09T15:42:33.271+0000] {processor.py:829} INFO - Processing file /opt/airflow/dags/diagnostic_pipeline.py for tasks to queue
+[2026-01-09T15:42:33.273+0000] {logging_mixin.py:154} INFO - [2026-01-09T15:42:33.272+0000] {dagbag.py:536} INFO - Filling up the DagBag from /opt/airflow/dags/diagnostic_pipeline.py
+[2026-01-09T15:42:36.315+0000] {processor.py:839} INFO - DAG(s) dict_keys(['diagnostic_pipeline']) retrieved from /opt/airflow/dags/diagnostic_pipeline.py
+[2026-01-09T15:42:36.349+0000] {logging_mixin.py:154} INFO - [2026-01-09T15:42:36.349+0000] {dag.py:2941} INFO - Sync 1 DAGs
+[2026-01-09T15:42:36.366+0000] {logging_mixin.py:154} INFO - [2026-01-09T15:42:36.366+0000] {dag.py:3722} INFO - Setting next_dagrun for diagnostic_pipeline to None, run_after=None
+[2026-01-09T15:42:36.387+0000] {processor.py:179} INFO - Processing /opt/airflow/dags/diagnostic_pipeline.py took 3.123 seconds
+[2026-01-09T15:43:06.645+0000] {processor.py:157} INFO - Started process (PID=2437) to work on /opt/airflow/dags/diagnostic_pipeline.py
+[2026-01-09T15:43:06.647+0000] {processor.py:829} INFO - Processing file /opt/airflow/dags/diagnostic_pipeline.py for tasks to queue
+[2026-01-09T15:43:06.648+0000] {logging_mixin.py:154} INFO - [2026-01-09T15:43:06.648+0000] {dagbag.py:536} INFO - Filling up the DagBag from /opt/airflow/dags/diagnostic_pipeline.py
+[2026-01-09T15:43:10.876+0000] {processor.py:839} INFO - DAG(s) dict_keys(['diagnostic_pipeline']) retrieved from /opt/airflow/dags/diagnostic_pipeline.py
+[2026-01-09T15:43:10.915+0000] {logging_mixin.py:154} INFO - [2026-01-09T15:43:10.915+0000] {dag.py:2941} INFO - Sync 1 DAGs
+[2026-01-09T15:43:10.933+0000] {logging_mixin.py:154} INFO - [2026-01-09T15:43:10.933+0000] {dag.py:3722} INFO - Setting next_dagrun for diagnostic_pipeline to None, run_after=None
+[2026-01-09T15:43:10.961+0000] {processor.py:179} INFO - Processing /opt/airflow/dags/diagnostic_pipeline.py took 4.321 seconds
+[2026-01-09T15:43:41.207+0000] {processor.py:157} INFO - Started process (PID=2455) to work on /opt/airflow/dags/diagnostic_pipeline.py
+[2026-01-09T15:43:41.208+0000] {processor.py:829} INFO - Processing file /opt/airflow/dags/diagnostic_pipeline.py for tasks to queue
+[2026-01-09T15:43:41.210+0000] {logging_mixin.py:154} INFO - [2026-01-09T15:43:41.209+0000] {dagbag.py:536} INFO - Filling up the DagBag from /opt/airflow/dags/diagnostic_pipeline.py
+[2026-01-09T15:43:44.537+0000] {processor.py:839} INFO - DAG(s) dict_keys(['diagnostic_pipeline']) retrieved from /opt/airflow/dags/diagnostic_pipeline.py
+[2026-01-09T15:43:44.569+0000] {logging_mixin.py:154} INFO - [2026-01-09T15:43:44.568+0000] {dag.py:2941} INFO - Sync 1 DAGs
+[2026-01-09T15:43:44.584+0000] {logging_mixin.py:154} INFO - [2026-01-09T15:43:44.584+0000] {dag.py:3722} INFO - Setting next_dagrun for diagnostic_pipeline to None, run_after=None
+[2026-01-09T15:43:44.604+0000] {processor.py:179} INFO - Processing /opt/airflow/dags/diagnostic_pipeline.py took 3.402 seconds
+[2026-01-09T15:44:14.693+0000] {processor.py:157} INFO - Started process (PID=2473) to work on /opt/airflow/dags/diagnostic_pipeline.py
+[2026-01-09T15:44:14.695+0000] {processor.py:829} INFO - Processing file /opt/airflow/dags/diagnostic_pipeline.py for tasks to queue
+[2026-01-09T15:44:14.696+0000] {logging_mixin.py:154} INFO - [2026-01-09T15:44:14.695+0000] {dagbag.py:536} INFO - Filling up the DagBag from /opt/airflow/dags/diagnostic_pipeline.py
+[2026-01-09T15:44:19.486+0000] {processor.py:839} INFO - DAG(s) dict_keys(['diagnostic_pipeline']) retrieved from /opt/airflow/dags/diagnostic_pipeline.py
+[2026-01-09T15:44:19.535+0000] {logging_mixin.py:154} INFO - [2026-01-09T15:44:19.534+0000] {dag.py:2941} INFO - Sync 1 DAGs
+[2026-01-09T15:44:19.560+0000] {logging_mixin.py:154} INFO - [2026-01-09T15:44:19.560+0000] {dag.py:3722} INFO - Setting next_dagrun for diagnostic_pipeline to None, run_after=None
+[2026-01-09T15:44:19.591+0000] {processor.py:179} INFO - Processing /opt/airflow/dags/diagnostic_pipeline.py took 4.904 seconds
+[2026-01-09T15:44:50.132+0000] {processor.py:157} INFO - Started process (PID=2491) to work on /opt/airflow/dags/diagnostic_pipeline.py
+[2026-01-09T15:44:50.133+0000] {processor.py:829} INFO - Processing file /opt/airflow/dags/diagnostic_pipeline.py for tasks to queue
+[2026-01-09T15:44:50.134+0000] {logging_mixin.py:154} INFO - [2026-01-09T15:44:50.134+0000] {dagbag.py:536} INFO - Filling up the DagBag from /opt/airflow/dags/diagnostic_pipeline.py
+[2026-01-09T15:44:53.585+0000] {processor.py:839} INFO - DAG(s) dict_keys(['diagnostic_pipeline']) retrieved from /opt/airflow/dags/diagnostic_pipeline.py
+[2026-01-09T15:44:53.617+0000] {logging_mixin.py:154} INFO - [2026-01-09T15:44:53.616+0000] {dag.py:2941} INFO - Sync 1 DAGs
+[2026-01-09T15:44:53.631+0000] {logging_mixin.py:154} INFO - [2026-01-09T15:44:53.631+0000] {dag.py:3722} INFO - Setting next_dagrun for diagnostic_pipeline to None, run_after=None
+[2026-01-09T15:44:53.653+0000] {processor.py:179} INFO - Processing /opt/airflow/dags/diagnostic_pipeline.py took 3.525 seconds
+[2026-01-09T15:45:24.372+0000] {processor.py:157} INFO - Started process (PID=2509) to work on /opt/airflow/dags/diagnostic_pipeline.py
+[2026-01-09T15:45:24.374+0000] {processor.py:829} INFO - Processing file /opt/airflow/dags/diagnostic_pipeline.py for tasks to queue
+[2026-01-09T15:45:24.376+0000] {logging_mixin.py:154} INFO - [2026-01-09T15:45:24.375+0000] {dagbag.py:536} INFO - Filling up the DagBag from /opt/airflow/dags/diagnostic_pipeline.py
+[2026-01-09T15:45:27.530+0000] {processor.py:839} INFO - DAG(s) dict_keys(['diagnostic_pipeline']) retrieved from /opt/airflow/dags/diagnostic_pipeline.py
+[2026-01-09T15:45:27.562+0000] {logging_mixin.py:154} INFO - [2026-01-09T15:45:27.561+0000] {dag.py:2941} INFO - Sync 1 DAGs
+[2026-01-09T15:45:27.577+0000] {logging_mixin.py:154} INFO - [2026-01-09T15:45:27.577+0000] {dag.py:3722} INFO - Setting next_dagrun for diagnostic_pipeline to None, run_after=None
+[2026-01-09T15:45:27.599+0000] {processor.py:179} INFO - Processing /opt/airflow/dags/diagnostic_pipeline.py took 3.233 seconds
+[2026-01-09T15:45:57.890+0000] {processor.py:157} INFO - Started process (PID=2532) to work on /opt/airflow/dags/diagnostic_pipeline.py
+[2026-01-09T15:45:57.892+0000] {processor.py:829} INFO - Processing file /opt/airflow/dags/diagnostic_pipeline.py for tasks to queue
+[2026-01-09T15:45:57.895+0000] {logging_mixin.py:154} INFO - [2026-01-09T15:45:57.894+0000] {dagbag.py:536} INFO - Filling up the DagBag from /opt/airflow/dags/diagnostic_pipeline.py
+[2026-01-09T15:46:00.966+0000] {processor.py:839} INFO - DAG(s) dict_keys(['diagnostic_pipeline']) retrieved from /opt/airflow/dags/diagnostic_pipeline.py
+[2026-01-09T15:46:01.002+0000] {logging_mixin.py:154} INFO - [2026-01-09T15:46:01.001+0000] {dag.py:2941} INFO - Sync 1 DAGs
+[2026-01-09T15:46:01.017+0000] {logging_mixin.py:154} INFO - [2026-01-09T15:46:01.017+0000] {dag.py:3722} INFO - Setting next_dagrun for diagnostic_pipeline to None, run_after=None
+[2026-01-09T15:46:01.039+0000] {processor.py:179} INFO - Processing /opt/airflow/dags/diagnostic_pipeline.py took 3.155 seconds
+[2026-01-09T15:46:31.271+0000] {processor.py:157} INFO - Started process (PID=2550) to work on /opt/airflow/dags/diagnostic_pipeline.py
+[2026-01-09T15:46:31.272+0000] {processor.py:829} INFO - Processing file /opt/airflow/dags/diagnostic_pipeline.py for tasks to queue
+[2026-01-09T15:46:31.276+0000] {logging_mixin.py:154} INFO - [2026-01-09T15:46:31.276+0000] {dagbag.py:536} INFO - Filling up the DagBag from /opt/airflow/dags/diagnostic_pipeline.py
+[2026-01-09T15:46:34.912+0000] {processor.py:839} INFO - DAG(s) dict_keys(['diagnostic_pipeline']) retrieved from /opt/airflow/dags/diagnostic_pipeline.py
+[2026-01-09T15:46:34.946+0000] {logging_mixin.py:154} INFO - [2026-01-09T15:46:34.945+0000] {dag.py:2941} INFO - Sync 1 DAGs
+[2026-01-09T15:46:34.961+0000] {logging_mixin.py:154} INFO - [2026-01-09T15:46:34.961+0000] {dag.py:3722} INFO - Setting next_dagrun for diagnostic_pipeline to None, run_after=None
+[2026-01-09T15:46:34.984+0000] {processor.py:179} INFO - Processing /opt/airflow/dags/diagnostic_pipeline.py took 3.721 seconds
+[2026-01-09T15:47:05.551+0000] {processor.py:157} INFO - Started process (PID=2568) to work on /opt/airflow/dags/diagnostic_pipeline.py
+[2026-01-09T15:47:05.553+0000] {processor.py:829} INFO - Processing file /opt/airflow/dags/diagnostic_pipeline.py for tasks to queue
+[2026-01-09T15:47:05.554+0000] {logging_mixin.py:154} INFO - [2026-01-09T15:47:05.554+0000] {dagbag.py:536} INFO - Filling up the DagBag from /opt/airflow/dags/diagnostic_pipeline.py
+[2026-01-09T15:47:08.310+0000] {processor.py:839} INFO - DAG(s) dict_keys(['diagnostic_pipeline']) retrieved from /opt/airflow/dags/diagnostic_pipeline.py
+[2026-01-09T15:47:08.346+0000] {logging_mixin.py:154} INFO - [2026-01-09T15:47:08.346+0000] {dag.py:2941} INFO - Sync 1 DAGs
+[2026-01-09T15:47:08.360+0000] {logging_mixin.py:154} INFO - [2026-01-09T15:47:08.360+0000] {dag.py:3722} INFO - Setting next_dagrun for diagnostic_pipeline to None, run_after=None
+[2026-01-09T15:47:08.381+0000] {processor.py:179} INFO - Processing /opt/airflow/dags/diagnostic_pipeline.py took 2.834 seconds
+[2026-01-09T15:47:38.449+0000] {processor.py:157} INFO - Started process (PID=2586) to work on /opt/airflow/dags/diagnostic_pipeline.py
+[2026-01-09T15:47:38.450+0000] {processor.py:829} INFO - Processing file /opt/airflow/dags/diagnostic_pipeline.py for tasks to queue
+[2026-01-09T15:47:38.451+0000] {logging_mixin.py:154} INFO - [2026-01-09T15:47:38.451+0000] {dagbag.py:536} INFO - Filling up the DagBag from /opt/airflow/dags/diagnostic_pipeline.py
+[2026-01-09T15:47:41.859+0000] {processor.py:839} INFO - DAG(s) dict_keys(['diagnostic_pipeline']) retrieved from /opt/airflow/dags/diagnostic_pipeline.py
+[2026-01-09T15:47:41.907+0000] {logging_mixin.py:154} INFO - [2026-01-09T15:47:41.907+0000] {dag.py:2941} INFO - Sync 1 DAGs
+[2026-01-09T15:47:41.927+0000] {logging_mixin.py:154} INFO - [2026-01-09T15:47:41.926+0000] {dag.py:3722} INFO - Setting next_dagrun for diagnostic_pipeline to None, run_after=None
+[2026-01-09T15:47:41.954+0000] {processor.py:179} INFO - Processing /opt/airflow/dags/diagnostic_pipeline.py took 3.510 seconds
+[2026-01-09T15:48:12.694+0000] {processor.py:157} INFO - Started process (PID=2604) to work on /opt/airflow/dags/diagnostic_pipeline.py
+[2026-01-09T15:48:12.696+0000] {processor.py:829} INFO - Processing file /opt/airflow/dags/diagnostic_pipeline.py for tasks to queue
+[2026-01-09T15:48:12.697+0000] {logging_mixin.py:154} INFO - [2026-01-09T15:48:12.697+0000] {dagbag.py:536} INFO - Filling up the DagBag from /opt/airflow/dags/diagnostic_pipeline.py
+[2026-01-09T15:48:15.849+0000] {processor.py:839} INFO - DAG(s) dict_keys(['diagnostic_pipeline']) retrieved from /opt/airflow/dags/diagnostic_pipeline.py
+[2026-01-09T15:48:15.890+0000] {logging_mixin.py:154} INFO - [2026-01-09T15:48:15.889+0000] {dag.py:2941} INFO - Sync 1 DAGs
+[2026-01-09T15:48:15.916+0000] {logging_mixin.py:154} INFO - [2026-01-09T15:48:15.915+0000] {dag.py:3722} INFO - Setting next_dagrun for diagnostic_pipeline to None, run_after=None
+[2026-01-09T15:48:15.957+0000] {processor.py:179} INFO - Processing /opt/airflow/dags/diagnostic_pipeline.py took 3.268 seconds
+[2026-01-09T15:48:46.201+0000] {processor.py:157} INFO - Started process (PID=2622) to work on /opt/airflow/dags/diagnostic_pipeline.py
+[2026-01-09T15:48:46.202+0000] {processor.py:829} INFO - Processing file /opt/airflow/dags/diagnostic_pipeline.py for tasks to queue
+[2026-01-09T15:48:46.203+0000] {logging_mixin.py:154} INFO - [2026-01-09T15:48:46.203+0000] {dagbag.py:536} INFO - Filling up the DagBag from /opt/airflow/dags/diagnostic_pipeline.py
+[2026-01-09T15:48:49.073+0000] {processor.py:839} INFO - DAG(s) dict_keys(['diagnostic_pipeline']) retrieved from /opt/airflow/dags/diagnostic_pipeline.py
+[2026-01-09T15:48:49.114+0000] {logging_mixin.py:154} INFO - [2026-01-09T15:48:49.113+0000] {dag.py:2941} INFO - Sync 1 DAGs
+[2026-01-09T15:48:49.129+0000] {logging_mixin.py:154} INFO - [2026-01-09T15:48:49.129+0000] {dag.py:3722} INFO - Setting next_dagrun for diagnostic_pipeline to None, run_after=None
+[2026-01-09T15:48:49.149+0000] {processor.py:179} INFO - Processing /opt/airflow/dags/diagnostic_pipeline.py took 2.954 seconds
+[2026-01-09T15:49:19.628+0000] {processor.py:157} INFO - Started process (PID=2640) to work on /opt/airflow/dags/diagnostic_pipeline.py
+[2026-01-09T15:49:19.630+0000] {processor.py:829} INFO - Processing file /opt/airflow/dags/diagnostic_pipeline.py for tasks to queue
+[2026-01-09T15:49:19.632+0000] {logging_mixin.py:154} INFO - [2026-01-09T15:49:19.631+0000] {dagbag.py:536} INFO - Filling up the DagBag from /opt/airflow/dags/diagnostic_pipeline.py
+[2026-01-09T15:49:23.229+0000] {processor.py:839} INFO - DAG(s) dict_keys(['diagnostic_pipeline']) retrieved from /opt/airflow/dags/diagnostic_pipeline.py
+[2026-01-09T15:49:23.266+0000] {logging_mixin.py:154} INFO - [2026-01-09T15:49:23.265+0000] {dag.py:2941} INFO - Sync 1 DAGs
+[2026-01-09T15:49:23.285+0000] {logging_mixin.py:154} INFO - [2026-01-09T15:49:23.285+0000] {dag.py:3722} INFO - Setting next_dagrun for diagnostic_pipeline to None, run_after=None
+[2026-01-09T15:49:23.312+0000] {processor.py:179} INFO - Processing /opt/airflow/dags/diagnostic_pipeline.py took 3.691 seconds
+[2026-01-09T15:49:53.392+0000] {processor.py:157} INFO - Started process (PID=2658) to work on /opt/airflow/dags/diagnostic_pipeline.py
+[2026-01-09T15:49:53.394+0000] {processor.py:829} INFO - Processing file /opt/airflow/dags/diagnostic_pipeline.py for tasks to queue
+[2026-01-09T15:49:53.397+0000] {logging_mixin.py:154} INFO - [2026-01-09T15:49:53.396+0000] {dagbag.py:536} INFO - Filling up the DagBag from /opt/airflow/dags/diagnostic_pipeline.py
+[2026-01-09T15:49:57.314+0000] {processor.py:839} INFO - DAG(s) dict_keys(['diagnostic_pipeline']) retrieved from /opt/airflow/dags/diagnostic_pipeline.py
+[2026-01-09T15:49:57.371+0000] {logging_mixin.py:154} INFO - [2026-01-09T15:49:57.370+0000] {dag.py:2941} INFO - Sync 1 DAGs
+[2026-01-09T15:49:57.396+0000] {logging_mixin.py:154} INFO - [2026-01-09T15:49:57.395+0000] {dag.py:3722} INFO - Setting next_dagrun for diagnostic_pipeline to None, run_after=None
+[2026-01-09T15:49:57.430+0000] {processor.py:179} INFO - Processing /opt/airflow/dags/diagnostic_pipeline.py took 4.043 seconds
+[2026-01-09T15:50:27.705+0000] {processor.py:157} INFO - Started process (PID=2676) to work on /opt/airflow/dags/diagnostic_pipeline.py
+[2026-01-09T15:50:27.706+0000] {processor.py:829} INFO - Processing file /opt/airflow/dags/diagnostic_pipeline.py for tasks to queue
+[2026-01-09T15:50:27.708+0000] {logging_mixin.py:154} INFO - [2026-01-09T15:50:27.708+0000] {dagbag.py:536} INFO - Filling up the DagBag from /opt/airflow/dags/diagnostic_pipeline.py
+[2026-01-09T15:50:30.886+0000] {processor.py:839} INFO - DAG(s) dict_keys(['diagnostic_pipeline']) retrieved from /opt/airflow/dags/diagnostic_pipeline.py
+[2026-01-09T15:50:30.919+0000] {logging_mixin.py:154} INFO - [2026-01-09T15:50:30.918+0000] {dag.py:2941} INFO - Sync 1 DAGs
+[2026-01-09T15:50:30.933+0000] {logging_mixin.py:154} INFO - [2026-01-09T15:50:30.933+0000] {dag.py:3722} INFO - Setting next_dagrun for diagnostic_pipeline to None, run_after=None
+[2026-01-09T15:50:30.956+0000] {processor.py:179} INFO - Processing /opt/airflow/dags/diagnostic_pipeline.py took 3.256 seconds
+[2026-01-09T15:51:01.197+0000] {processor.py:157} INFO - Started process (PID=2699) to work on /opt/airflow/dags/diagnostic_pipeline.py
+[2026-01-09T15:51:01.198+0000] {processor.py:829} INFO - Processing file /opt/airflow/dags/diagnostic_pipeline.py for tasks to queue
+[2026-01-09T15:51:01.199+0000] {logging_mixin.py:154} INFO - [2026-01-09T15:51:01.199+0000] {dagbag.py:536} INFO - Filling up the DagBag from /opt/airflow/dags/diagnostic_pipeline.py
+[2026-01-09T15:51:04.940+0000] {processor.py:839} INFO - DAG(s) dict_keys(['diagnostic_pipeline']) retrieved from /opt/airflow/dags/diagnostic_pipeline.py
+[2026-01-09T15:51:04.994+0000] {logging_mixin.py:154} INFO - [2026-01-09T15:51:04.993+0000] {dag.py:2941} INFO - Sync 1 DAGs
+[2026-01-09T15:51:05.022+0000] {logging_mixin.py:154} INFO - [2026-01-09T15:51:05.022+0000] {dag.py:3722} INFO - Setting next_dagrun for diagnostic_pipeline to None, run_after=None
+[2026-01-09T15:51:05.064+0000] {processor.py:179} INFO - Processing /opt/airflow/dags/diagnostic_pipeline.py took 3.872 seconds
+[2026-01-09T15:51:35.681+0000] {processor.py:157} INFO - Started process (PID=2717) to work on /opt/airflow/dags/diagnostic_pipeline.py
+[2026-01-09T15:51:35.683+0000] {processor.py:829} INFO - Processing file /opt/airflow/dags/diagnostic_pipeline.py for tasks to queue
+[2026-01-09T15:51:35.684+0000] {logging_mixin.py:154} INFO - [2026-01-09T15:51:35.683+0000] {dagbag.py:536} INFO - Filling up the DagBag from /opt/airflow/dags/diagnostic_pipeline.py
+[2026-01-09T15:51:38.846+0000] {processor.py:839} INFO - DAG(s) dict_keys(['diagnostic_pipeline']) retrieved from /opt/airflow/dags/diagnostic_pipeline.py
+[2026-01-09T15:51:38.879+0000] {logging_mixin.py:154} INFO - [2026-01-09T15:51:38.879+0000] {dag.py:2941} INFO - Sync 1 DAGs
+[2026-01-09T15:51:38.897+0000] {logging_mixin.py:154} INFO - [2026-01-09T15:51:38.897+0000] {dag.py:3722} INFO - Setting next_dagrun for diagnostic_pipeline to None, run_after=None
+[2026-01-09T15:51:38.928+0000] {processor.py:179} INFO - Processing /opt/airflow/dags/diagnostic_pipeline.py took 3.252 seconds
+[2026-01-09T15:52:09.178+0000] {processor.py:157} INFO - Started process (PID=2735) to work on /opt/airflow/dags/diagnostic_pipeline.py
+[2026-01-09T15:52:09.179+0000] {processor.py:829} INFO - Processing file /opt/airflow/dags/diagnostic_pipeline.py for tasks to queue
+[2026-01-09T15:52:09.180+0000] {logging_mixin.py:154} INFO - [2026-01-09T15:52:09.180+0000] {dagbag.py:536} INFO - Filling up the DagBag from /opt/airflow/dags/diagnostic_pipeline.py
+[2026-01-09T15:52:12.699+0000] {processor.py:839} INFO - DAG(s) dict_keys(['diagnostic_pipeline']) retrieved from /opt/airflow/dags/diagnostic_pipeline.py
+[2026-01-09T15:52:12.730+0000] {logging_mixin.py:154} INFO - [2026-01-09T15:52:12.730+0000] {dag.py:2941} INFO - Sync 1 DAGs
+[2026-01-09T15:52:12.745+0000] {logging_mixin.py:154} INFO - [2026-01-09T15:52:12.745+0000] {dag.py:3722} INFO - Setting next_dagrun for diagnostic_pipeline to None, run_after=None
+[2026-01-09T15:52:12.769+0000] {processor.py:179} INFO - Processing /opt/airflow/dags/diagnostic_pipeline.py took 3.596 seconds
+[2026-01-09T15:52:43.588+0000] {processor.py:157} INFO - Started process (PID=2753) to work on /opt/airflow/dags/diagnostic_pipeline.py
+[2026-01-09T15:52:43.592+0000] {processor.py:829} INFO - Processing file /opt/airflow/dags/diagnostic_pipeline.py for tasks to queue
+[2026-01-09T15:52:43.594+0000] {logging_mixin.py:154} INFO - [2026-01-09T15:52:43.593+0000] {dagbag.py:536} INFO - Filling up the DagBag from /opt/airflow/dags/diagnostic_pipeline.py
+[2026-01-09T15:52:47.098+0000] {processor.py:839} INFO - DAG(s) dict_keys(['diagnostic_pipeline']) retrieved from /opt/airflow/dags/diagnostic_pipeline.py
+[2026-01-09T15:52:47.138+0000] {logging_mixin.py:154} INFO - [2026-01-09T15:52:47.138+0000] {dag.py:2941} INFO - Sync 1 DAGs
+[2026-01-09T15:52:47.154+0000] {logging_mixin.py:154} INFO - [2026-01-09T15:52:47.154+0000] {dag.py:3722} INFO - Setting next_dagrun for diagnostic_pipeline to None, run_after=None
+[2026-01-09T15:52:47.179+0000] {processor.py:179} INFO - Processing /opt/airflow/dags/diagnostic_pipeline.py took 3.617 seconds
+[2026-01-09T15:53:17.299+0000] {processor.py:157} INFO - Started process (PID=2771) to work on /opt/airflow/dags/diagnostic_pipeline.py
+[2026-01-09T15:53:17.302+0000] {processor.py:829} INFO - Processing file /opt/airflow/dags/diagnostic_pipeline.py for tasks to queue
+[2026-01-09T15:53:17.306+0000] {logging_mixin.py:154} INFO - [2026-01-09T15:53:17.306+0000] {dagbag.py:536} INFO - Filling up the DagBag from /opt/airflow/dags/diagnostic_pipeline.py
+[2026-01-09T15:53:20.839+0000] {processor.py:839} INFO - DAG(s) dict_keys(['diagnostic_pipeline']) retrieved from /opt/airflow/dags/diagnostic_pipeline.py
+[2026-01-09T15:53:20.871+0000] {logging_mixin.py:154} INFO - [2026-01-09T15:53:20.870+0000] {dag.py:2941} INFO - Sync 1 DAGs
+[2026-01-09T15:53:20.886+0000] {logging_mixin.py:154} INFO - [2026-01-09T15:53:20.886+0000] {dag.py:3722} INFO - Setting next_dagrun for diagnostic_pipeline to None, run_after=None
+[2026-01-09T15:53:20.907+0000] {processor.py:179} INFO - Processing /opt/airflow/dags/diagnostic_pipeline.py took 3.616 seconds
+[2026-01-09T15:53:51.534+0000] {processor.py:157} INFO - Started process (PID=2789) to work on /opt/airflow/dags/diagnostic_pipeline.py
+[2026-01-09T15:53:51.554+0000] {processor.py:829} INFO - Processing file /opt/airflow/dags/diagnostic_pipeline.py for tasks to queue
+[2026-01-09T15:53:51.557+0000] {logging_mixin.py:154} INFO - [2026-01-09T15:53:51.557+0000] {dagbag.py:536} INFO - Filling up the DagBag from /opt/airflow/dags/diagnostic_pipeline.py
+[2026-01-09T15:53:54.591+0000] {processor.py:839} INFO - DAG(s) dict_keys(['diagnostic_pipeline']) retrieved from /opt/airflow/dags/diagnostic_pipeline.py
+[2026-01-09T15:53:54.623+0000] {logging_mixin.py:154} INFO - [2026-01-09T15:53:54.623+0000] {dag.py:2941} INFO - Sync 1 DAGs
+[2026-01-09T15:53:54.637+0000] {logging_mixin.py:154} INFO - [2026-01-09T15:53:54.637+0000] {dag.py:3722} INFO - Setting next_dagrun for diagnostic_pipeline to None, run_after=None
+[2026-01-09T15:53:54.660+0000] {processor.py:179} INFO - Processing /opt/airflow/dags/diagnostic_pipeline.py took 3.130 seconds
+[2026-01-09T15:54:25.088+0000] {processor.py:157} INFO - Started process (PID=2807) to work on /opt/airflow/dags/diagnostic_pipeline.py
+[2026-01-09T15:54:25.091+0000] {processor.py:829} INFO - Processing file /opt/airflow/dags/diagnostic_pipeline.py for tasks to queue
+[2026-01-09T15:54:25.093+0000] {logging_mixin.py:154} INFO - [2026-01-09T15:54:25.092+0000] {dagbag.py:536} INFO - Filling up the DagBag from /opt/airflow/dags/diagnostic_pipeline.py
+[2026-01-09T15:54:28.427+0000] {processor.py:839} INFO - DAG(s) dict_keys(['diagnostic_pipeline']) retrieved from /opt/airflow/dags/diagnostic_pipeline.py
+[2026-01-09T15:54:28.464+0000] {logging_mixin.py:154} INFO - [2026-01-09T15:54:28.463+0000] {dag.py:2941} INFO - Sync 1 DAGs
+[2026-01-09T15:54:28.484+0000] {logging_mixin.py:154} INFO - [2026-01-09T15:54:28.483+0000] {dag.py:3722} INFO - Setting next_dagrun for diagnostic_pipeline to None, run_after=None
+[2026-01-09T15:54:28.508+0000] {processor.py:179} INFO - Processing /opt/airflow/dags/diagnostic_pipeline.py took 3.427 seconds
+[2026-01-09T15:54:59.327+0000] {processor.py:157} INFO - Started process (PID=2825) to work on /opt/airflow/dags/diagnostic_pipeline.py
+[2026-01-09T15:54:59.328+0000] {processor.py:829} INFO - Processing file /opt/airflow/dags/diagnostic_pipeline.py for tasks to queue
+[2026-01-09T15:54:59.330+0000] {logging_mixin.py:154} INFO - [2026-01-09T15:54:59.329+0000] {dagbag.py:536} INFO - Filling up the DagBag from /opt/airflow/dags/diagnostic_pipeline.py
+[2026-01-09T15:55:02.433+0000] {processor.py:839} INFO - DAG(s) dict_keys(['diagnostic_pipeline']) retrieved from /opt/airflow/dags/diagnostic_pipeline.py
+[2026-01-09T15:55:02.467+0000] {logging_mixin.py:154} INFO - [2026-01-09T15:55:02.466+0000] {dag.py:2941} INFO - Sync 1 DAGs
+[2026-01-09T15:55:02.482+0000] {logging_mixin.py:154} INFO - [2026-01-09T15:55:02.482+0000] {dag.py:3722} INFO - Setting next_dagrun for diagnostic_pipeline to None, run_after=None
+[2026-01-09T15:55:02.503+0000] {processor.py:179} INFO - Processing /opt/airflow/dags/diagnostic_pipeline.py took 3.181 seconds
+[2026-01-09T15:55:32.795+0000] {processor.py:157} INFO - Started process (PID=2843) to work on /opt/airflow/dags/diagnostic_pipeline.py
+[2026-01-09T15:55:32.797+0000] {processor.py:829} INFO - Processing file /opt/airflow/dags/diagnostic_pipeline.py for tasks to queue
+[2026-01-09T15:55:32.798+0000] {logging_mixin.py:154} INFO - [2026-01-09T15:55:32.798+0000] {dagbag.py:536} INFO - Filling up the DagBag from /opt/airflow/dags/diagnostic_pipeline.py
+[2026-01-09T15:55:36.022+0000] {processor.py:839} INFO - DAG(s) dict_keys(['diagnostic_pipeline']) retrieved from /opt/airflow/dags/diagnostic_pipeline.py
+[2026-01-09T15:55:36.064+0000] {logging_mixin.py:154} INFO - [2026-01-09T15:55:36.063+0000] {dag.py:2941} INFO - Sync 1 DAGs
+[2026-01-09T15:55:36.086+0000] {logging_mixin.py:154} INFO - [2026-01-09T15:55:36.086+0000] {dag.py:3722} INFO - Setting next_dagrun for diagnostic_pipeline to None, run_after=None
+[2026-01-09T15:55:36.114+0000] {processor.py:179} INFO - Processing /opt/airflow/dags/diagnostic_pipeline.py took 3.325 seconds
+[2026-01-09T15:56:06.376+0000] {processor.py:157} INFO - Started process (PID=2866) to work on /opt/airflow/dags/diagnostic_pipeline.py
+[2026-01-09T15:56:06.377+0000] {processor.py:829} INFO - Processing file /opt/airflow/dags/diagnostic_pipeline.py for tasks to queue
+[2026-01-09T15:56:06.378+0000] {logging_mixin.py:154} INFO - [2026-01-09T15:56:06.378+0000] {dagbag.py:536} INFO - Filling up the DagBag from /opt/airflow/dags/diagnostic_pipeline.py
+[2026-01-09T15:56:09.599+0000] {processor.py:839} INFO - DAG(s) dict_keys(['diagnostic_pipeline']) retrieved from /opt/airflow/dags/diagnostic_pipeline.py
+[2026-01-09T15:56:09.636+0000] {logging_mixin.py:154} INFO - [2026-01-09T15:56:09.635+0000] {dag.py:2941} INFO - Sync 1 DAGs
+[2026-01-09T15:56:09.662+0000] {logging_mixin.py:154} INFO - [2026-01-09T15:56:09.661+0000] {dag.py:3722} INFO - Setting next_dagrun for diagnostic_pipeline to None, run_after=None
+[2026-01-09T15:56:09.699+0000] {processor.py:179} INFO - Processing /opt/airflow/dags/diagnostic_pipeline.py took 3.329 seconds
+[2026-01-09T15:56:39.956+0000] {processor.py:157} INFO - Started process (PID=2884) to work on /opt/airflow/dags/diagnostic_pipeline.py
+[2026-01-09T15:56:39.958+0000] {processor.py:829} INFO - Processing file /opt/airflow/dags/diagnostic_pipeline.py for tasks to queue
+[2026-01-09T15:56:39.959+0000] {logging_mixin.py:154} INFO - [2026-01-09T15:56:39.959+0000] {dagbag.py:536} INFO - Filling up the DagBag from /opt/airflow/dags/diagnostic_pipeline.py
+[2026-01-09T15:56:44.557+0000] {processor.py:839} INFO - DAG(s) dict_keys(['diagnostic_pipeline']) retrieved from /opt/airflow/dags/diagnostic_pipeline.py
+[2026-01-09T15:56:44.612+0000] {logging_mixin.py:154} INFO - [2026-01-09T15:56:44.611+0000] {dag.py:2941} INFO - Sync 1 DAGs
+[2026-01-09T15:56:44.639+0000] {logging_mixin.py:154} INFO - [2026-01-09T15:56:44.638+0000] {dag.py:3722} INFO - Setting next_dagrun for diagnostic_pipeline to None, run_after=None
+[2026-01-09T15:56:44.668+0000] {processor.py:179} INFO - Processing /opt/airflow/dags/diagnostic_pipeline.py took 4.718 seconds
+[2026-01-09T15:57:15.443+0000] {processor.py:157} INFO - Started process (PID=2902) to work on /opt/airflow/dags/diagnostic_pipeline.py
+[2026-01-09T15:57:15.445+0000] {processor.py:829} INFO - Processing file /opt/airflow/dags/diagnostic_pipeline.py for tasks to queue
+[2026-01-09T15:57:15.446+0000] {logging_mixin.py:154} INFO - [2026-01-09T15:57:15.446+0000] {dagbag.py:536} INFO - Filling up the DagBag from /opt/airflow/dags/diagnostic_pipeline.py
+[2026-01-09T15:57:19.402+0000] {processor.py:839} INFO - DAG(s) dict_keys(['diagnostic_pipeline']) retrieved from /opt/airflow/dags/diagnostic_pipeline.py
+[2026-01-09T15:57:19.439+0000] {logging_mixin.py:154} INFO - [2026-01-09T15:57:19.438+0000] {dag.py:2941} INFO - Sync 1 DAGs
+[2026-01-09T15:57:19.456+0000] {logging_mixin.py:154} INFO - [2026-01-09T15:57:19.456+0000] {dag.py:3722} INFO - Setting next_dagrun for diagnostic_pipeline to None, run_after=None
+[2026-01-09T15:57:19.478+0000] {processor.py:179} INFO - Processing /opt/airflow/dags/diagnostic_pipeline.py took 4.040 seconds
+[2026-01-09T15:57:49.864+0000] {processor.py:157} INFO - Started process (PID=2920) to work on /opt/airflow/dags/diagnostic_pipeline.py
+[2026-01-09T15:57:49.866+0000] {processor.py:829} INFO - Processing file /opt/airflow/dags/diagnostic_pipeline.py for tasks to queue
+[2026-01-09T15:57:49.867+0000] {logging_mixin.py:154} INFO - [2026-01-09T15:57:49.867+0000] {dagbag.py:536} INFO - Filling up the DagBag from /opt/airflow/dags/diagnostic_pipeline.py
+[2026-01-09T15:57:53.675+0000] {processor.py:839} INFO - DAG(s) dict_keys(['diagnostic_pipeline']) retrieved from /opt/airflow/dags/diagnostic_pipeline.py
+[2026-01-09T15:57:53.707+0000] {logging_mixin.py:154} INFO - [2026-01-09T15:57:53.707+0000] {dag.py:2941} INFO - Sync 1 DAGs
+[2026-01-09T15:57:53.722+0000] {logging_mixin.py:154} INFO - [2026-01-09T15:57:53.722+0000] {dag.py:3722} INFO - Setting next_dagrun for diagnostic_pipeline to None, run_after=None
+[2026-01-09T15:57:53.744+0000] {processor.py:179} INFO - Processing /opt/airflow/dags/diagnostic_pipeline.py took 3.886 seconds
+[2026-01-09T15:58:23.878+0000] {processor.py:157} INFO - Started process (PID=2938) to work on /opt/airflow/dags/diagnostic_pipeline.py
+[2026-01-09T15:58:23.880+0000] {processor.py:829} INFO - Processing file /opt/airflow/dags/diagnostic_pipeline.py for tasks to queue
+[2026-01-09T15:58:23.882+0000] {logging_mixin.py:154} INFO - [2026-01-09T15:58:23.881+0000] {dagbag.py:536} INFO - Filling up the DagBag from /opt/airflow/dags/diagnostic_pipeline.py
+[2026-01-09T15:58:28.576+0000] {processor.py:839} INFO - DAG(s) dict_keys(['diagnostic_pipeline']) retrieved from /opt/airflow/dags/diagnostic_pipeline.py
+[2026-01-09T15:58:28.625+0000] {logging_mixin.py:154} INFO - [2026-01-09T15:58:28.624+0000] {dag.py:2941} INFO - Sync 1 DAGs
+[2026-01-09T15:58:28.647+0000] {logging_mixin.py:154} INFO - [2026-01-09T15:58:28.647+0000] {dag.py:3722} INFO - Setting next_dagrun for diagnostic_pipeline to None, run_after=None
+[2026-01-09T15:58:28.675+0000] {processor.py:179} INFO - Processing /opt/airflow/dags/diagnostic_pipeline.py took 4.802 seconds
+[2026-01-09T15:58:58.980+0000] {processor.py:157} INFO - Started process (PID=2956) to work on /opt/airflow/dags/diagnostic_pipeline.py
+[2026-01-09T15:58:58.982+0000] {processor.py:829} INFO - Processing file /opt/airflow/dags/diagnostic_pipeline.py for tasks to queue
+[2026-01-09T15:58:58.983+0000] {logging_mixin.py:154} INFO - [2026-01-09T15:58:58.983+0000] {dagbag.py:536} INFO - Filling up the DagBag from /opt/airflow/dags/diagnostic_pipeline.py
+[2026-01-09T15:59:02.821+0000] {processor.py:839} INFO - DAG(s) dict_keys(['diagnostic_pipeline']) retrieved from /opt/airflow/dags/diagnostic_pipeline.py
+[2026-01-09T15:59:02.854+0000] {logging_mixin.py:154} INFO - [2026-01-09T15:59:02.854+0000] {dag.py:2941} INFO - Sync 1 DAGs
+[2026-01-09T15:59:02.869+0000] {logging_mixin.py:154} INFO - [2026-01-09T15:59:02.869+0000] {dag.py:3722} INFO - Setting next_dagrun for diagnostic_pipeline to None, run_after=None
+[2026-01-09T15:59:02.893+0000] {processor.py:179} INFO - Processing /opt/airflow/dags/diagnostic_pipeline.py took 3.921 seconds
+[2026-01-09T15:59:33.472+0000] {processor.py:157} INFO - Started process (PID=2974) to work on /opt/airflow/dags/diagnostic_pipeline.py
+[2026-01-09T15:59:33.475+0000] {processor.py:829} INFO - Processing file /opt/airflow/dags/diagnostic_pipeline.py for tasks to queue
+[2026-01-09T15:59:33.477+0000] {logging_mixin.py:154} INFO - [2026-01-09T15:59:33.477+0000] {dagbag.py:536} INFO - Filling up the DagBag from /opt/airflow/dags/diagnostic_pipeline.py
+[2026-01-09T15:59:37.160+0000] {processor.py:839} INFO - DAG(s) dict_keys(['diagnostic_pipeline']) retrieved from /opt/airflow/dags/diagnostic_pipeline.py
+[2026-01-09T15:59:37.195+0000] {logging_mixin.py:154} INFO - [2026-01-09T15:59:37.194+0000] {dag.py:2941} INFO - Sync 1 DAGs
+[2026-01-09T15:59:37.214+0000] {logging_mixin.py:154} INFO - [2026-01-09T15:59:37.214+0000] {dag.py:3722} INFO - Setting next_dagrun for diagnostic_pipeline to None, run_after=None
+[2026-01-09T15:59:37.234+0000] {processor.py:179} INFO - Processing /opt/airflow/dags/diagnostic_pipeline.py took 3.769 seconds
+[2026-01-09T16:00:07.345+0000] {processor.py:157} INFO - Started process (PID=2992) to work on /opt/airflow/dags/diagnostic_pipeline.py
+[2026-01-09T16:00:07.347+0000] {processor.py:829} INFO - Processing file /opt/airflow/dags/diagnostic_pipeline.py for tasks to queue
+[2026-01-09T16:00:07.348+0000] {logging_mixin.py:154} INFO - [2026-01-09T16:00:07.347+0000] {dagbag.py:536} INFO - Filling up the DagBag from /opt/airflow/dags/diagnostic_pipeline.py
+[2026-01-09T16:00:10.150+0000] {processor.py:839} INFO - DAG(s) dict_keys(['diagnostic_pipeline']) retrieved from /opt/airflow/dags/diagnostic_pipeline.py
+[2026-01-09T16:00:10.180+0000] {logging_mixin.py:154} INFO - [2026-01-09T16:00:10.179+0000] {dag.py:2941} INFO - Sync 1 DAGs
+[2026-01-09T16:00:10.193+0000] {logging_mixin.py:154} INFO - [2026-01-09T16:00:10.193+0000] {dag.py:3722} INFO - Setting next_dagrun for diagnostic_pipeline to None, run_after=None
+[2026-01-09T16:00:10.214+0000] {processor.py:179} INFO - Processing /opt/airflow/dags/diagnostic_pipeline.py took 2.874 seconds
+[2026-01-09T16:00:40.772+0000] {processor.py:157} INFO - Started process (PID=3015) to work on /opt/airflow/dags/diagnostic_pipeline.py
+[2026-01-09T16:00:40.774+0000] {processor.py:829} INFO - Processing file /opt/airflow/dags/diagnostic_pipeline.py for tasks to queue
+[2026-01-09T16:00:40.775+0000] {logging_mixin.py:154} INFO - [2026-01-09T16:00:40.775+0000] {dagbag.py:536} INFO - Filling up the DagBag from /opt/airflow/dags/diagnostic_pipeline.py
+[2026-01-09T16:00:43.553+0000] {processor.py:839} INFO - DAG(s) dict_keys(['diagnostic_pipeline']) retrieved from /opt/airflow/dags/diagnostic_pipeline.py
+[2026-01-09T16:00:43.587+0000] {logging_mixin.py:154} INFO - [2026-01-09T16:00:43.586+0000] {dag.py:2941} INFO - Sync 1 DAGs
+[2026-01-09T16:00:43.601+0000] {logging_mixin.py:154} INFO - [2026-01-09T16:00:43.601+0000] {dag.py:3722} INFO - Setting next_dagrun for diagnostic_pipeline to None, run_after=None
+[2026-01-09T16:00:43.624+0000] {processor.py:179} INFO - Processing /opt/airflow/dags/diagnostic_pipeline.py took 2.859 seconds
+[2026-01-09T16:01:13.690+0000] {processor.py:157} INFO - Started process (PID=3033) to work on /opt/airflow/dags/diagnostic_pipeline.py
+[2026-01-09T16:01:13.692+0000] {processor.py:829} INFO - Processing file /opt/airflow/dags/diagnostic_pipeline.py for tasks to queue
+[2026-01-09T16:01:13.693+0000] {logging_mixin.py:154} INFO - [2026-01-09T16:01:13.692+0000] {dagbag.py:536} INFO - Filling up the DagBag from /opt/airflow/dags/diagnostic_pipeline.py
+[2026-01-09T16:01:16.814+0000] {processor.py:839} INFO - DAG(s) dict_keys(['diagnostic_pipeline']) retrieved from /opt/airflow/dags/diagnostic_pipeline.py
+[2026-01-09T16:01:16.846+0000] {logging_mixin.py:154} INFO - [2026-01-09T16:01:16.845+0000] {dag.py:2941} INFO - Sync 1 DAGs
+[2026-01-09T16:01:16.861+0000] {logging_mixin.py:154} INFO - [2026-01-09T16:01:16.861+0000] {dag.py:3722} INFO - Setting next_dagrun for diagnostic_pipeline to None, run_after=None
+[2026-01-09T16:01:16.885+0000] {processor.py:179} INFO - Processing /opt/airflow/dags/diagnostic_pipeline.py took 3.199 seconds
+[2026-01-09T16:01:47.139+0000] {processor.py:157} INFO - Started process (PID=3051) to work on /opt/airflow/dags/diagnostic_pipeline.py
+[2026-01-09T16:01:47.140+0000] {processor.py:829} INFO - Processing file /opt/airflow/dags/diagnostic_pipeline.py for tasks to queue
+[2026-01-09T16:01:47.142+0000] {logging_mixin.py:154} INFO - [2026-01-09T16:01:47.141+0000] {dagbag.py:536} INFO - Filling up the DagBag from /opt/airflow/dags/diagnostic_pipeline.py
+[2026-01-09T16:01:49.898+0000] {processor.py:839} INFO - DAG(s) dict_keys(['diagnostic_pipeline']) retrieved from /opt/airflow/dags/diagnostic_pipeline.py
+[2026-01-09T16:01:49.931+0000] {logging_mixin.py:154} INFO - [2026-01-09T16:01:49.930+0000] {dag.py:2941} INFO - Sync 1 DAGs
+[2026-01-09T16:01:49.949+0000] {logging_mixin.py:154} INFO - [2026-01-09T16:01:49.948+0000] {dag.py:3722} INFO - Setting next_dagrun for diagnostic_pipeline to None, run_after=None
+[2026-01-09T16:01:49.971+0000] {processor.py:179} INFO - Processing /opt/airflow/dags/diagnostic_pipeline.py took 2.837 seconds
+[2026-01-09T16:02:20.653+0000] {processor.py:157} INFO - Started process (PID=3069) to work on /opt/airflow/dags/diagnostic_pipeline.py
+[2026-01-09T16:02:20.654+0000] {processor.py:829} INFO - Processing file /opt/airflow/dags/diagnostic_pipeline.py for tasks to queue
+[2026-01-09T16:02:20.655+0000] {logging_mixin.py:154} INFO - [2026-01-09T16:02:20.655+0000] {dagbag.py:536} INFO - Filling up the DagBag from /opt/airflow/dags/diagnostic_pipeline.py
+[2026-01-09T16:02:23.449+0000] {processor.py:839} INFO - DAG(s) dict_keys(['diagnostic_pipeline']) retrieved from /opt/airflow/dags/diagnostic_pipeline.py
+[2026-01-09T16:02:23.482+0000] {logging_mixin.py:154} INFO - [2026-01-09T16:02:23.481+0000] {dag.py:2941} INFO - Sync 1 DAGs
+[2026-01-09T16:02:23.497+0000] {logging_mixin.py:154} INFO - [2026-01-09T16:02:23.497+0000] {dag.py:3722} INFO - Setting next_dagrun for diagnostic_pipeline to None, run_after=None
+[2026-01-09T16:02:23.521+0000] {processor.py:179} INFO - Processing /opt/airflow/dags/diagnostic_pipeline.py took 2.872 seconds
+[2026-01-09T16:02:53.586+0000] {processor.py:157} INFO - Started process (PID=3087) to work on /opt/airflow/dags/diagnostic_pipeline.py
+[2026-01-09T16:02:53.588+0000] {processor.py:829} INFO - Processing file /opt/airflow/dags/diagnostic_pipeline.py for tasks to queue
+[2026-01-09T16:02:53.590+0000] {logging_mixin.py:154} INFO - [2026-01-09T16:02:53.589+0000] {dagbag.py:536} INFO - Filling up the DagBag from /opt/airflow/dags/diagnostic_pipeline.py
+[2026-01-09T16:02:56.365+0000] {processor.py:839} INFO - DAG(s) dict_keys(['diagnostic_pipeline']) retrieved from /opt/airflow/dags/diagnostic_pipeline.py
+[2026-01-09T16:02:56.395+0000] {logging_mixin.py:154} INFO - [2026-01-09T16:02:56.395+0000] {dag.py:2941} INFO - Sync 1 DAGs
+[2026-01-09T16:02:56.409+0000] {logging_mixin.py:154} INFO - [2026-01-09T16:02:56.409+0000] {dag.py:3722} INFO - Setting next_dagrun for diagnostic_pipeline to None, run_after=None
+[2026-01-09T16:02:56.430+0000] {processor.py:179} INFO - Processing /opt/airflow/dags/diagnostic_pipeline.py took 2.850 seconds
+[2026-01-09T16:03:26.745+0000] {processor.py:157} INFO - Started process (PID=3105) to work on /opt/airflow/dags/diagnostic_pipeline.py
+[2026-01-09T16:03:26.746+0000] {processor.py:829} INFO - Processing file /opt/airflow/dags/diagnostic_pipeline.py for tasks to queue
+[2026-01-09T16:03:26.747+0000] {logging_mixin.py:154} INFO - [2026-01-09T16:03:26.747+0000] {dagbag.py:536} INFO - Filling up the DagBag from /opt/airflow/dags/diagnostic_pipeline.py
+[2026-01-09T16:03:29.478+0000] {processor.py:839} INFO - DAG(s) dict_keys(['diagnostic_pipeline']) retrieved from /opt/airflow/dags/diagnostic_pipeline.py
+[2026-01-09T16:03:29.511+0000] {logging_mixin.py:154} INFO - [2026-01-09T16:03:29.510+0000] {dag.py:2941} INFO - Sync 1 DAGs
+[2026-01-09T16:03:29.527+0000] {logging_mixin.py:154} INFO - [2026-01-09T16:03:29.526+0000] {dag.py:3722} INFO - Setting next_dagrun for diagnostic_pipeline to None, run_after=None
+[2026-01-09T16:03:29.549+0000] {processor.py:179} INFO - Processing /opt/airflow/dags/diagnostic_pipeline.py took 2.809 seconds
+[2026-01-09T16:03:59.676+0000] {processor.py:157} INFO - Started process (PID=3123) to work on /opt/airflow/dags/diagnostic_pipeline.py
+[2026-01-09T16:03:59.677+0000] {processor.py:829} INFO - Processing file /opt/airflow/dags/diagnostic_pipeline.py for tasks to queue
+[2026-01-09T16:03:59.678+0000] {logging_mixin.py:154} INFO - [2026-01-09T16:03:59.678+0000] {dagbag.py:536} INFO - Filling up the DagBag from /opt/airflow/dags/diagnostic_pipeline.py
+[2026-01-09T16:04:02.772+0000] {processor.py:839} INFO - DAG(s) dict_keys(['diagnostic_pipeline']) retrieved from /opt/airflow/dags/diagnostic_pipeline.py
+[2026-01-09T16:04:02.804+0000] {logging_mixin.py:154} INFO - [2026-01-09T16:04:02.803+0000] {dag.py:2941} INFO - Sync 1 DAGs
+[2026-01-09T16:04:02.818+0000] {logging_mixin.py:154} INFO - [2026-01-09T16:04:02.818+0000] {dag.py:3722} INFO - Setting next_dagrun for diagnostic_pipeline to None, run_after=None
+[2026-01-09T16:04:02.840+0000] {processor.py:179} INFO - Processing /opt/airflow/dags/diagnostic_pipeline.py took 3.171 seconds
+[2026-01-09T16:04:33.112+0000] {processor.py:157} INFO - Started process (PID=3141) to work on /opt/airflow/dags/diagnostic_pipeline.py
+[2026-01-09T16:04:33.114+0000] {processor.py:829} INFO - Processing file /opt/airflow/dags/diagnostic_pipeline.py for tasks to queue
+[2026-01-09T16:04:33.115+0000] {logging_mixin.py:154} INFO - [2026-01-09T16:04:33.114+0000] {dagbag.py:536} INFO - Filling up the DagBag from /opt/airflow/dags/diagnostic_pipeline.py
+[2026-01-09T16:04:35.816+0000] {processor.py:839} INFO - DAG(s) dict_keys(['diagnostic_pipeline']) retrieved from /opt/airflow/dags/diagnostic_pipeline.py
+[2026-01-09T16:04:35.848+0000] {logging_mixin.py:154} INFO - [2026-01-09T16:04:35.848+0000] {dag.py:2941} INFO - Sync 1 DAGs
+[2026-01-09T16:04:35.863+0000] {logging_mixin.py:154} INFO - [2026-01-09T16:04:35.863+0000] {dag.py:3722} INFO - Setting next_dagrun for diagnostic_pipeline to None, run_after=None
+[2026-01-09T16:04:35.884+0000] {processor.py:179} INFO - Processing /opt/airflow/dags/diagnostic_pipeline.py took 2.777 seconds
+[2026-01-09T16:05:06.524+0000] {processor.py:157} INFO - Started process (PID=3159) to work on /opt/airflow/dags/diagnostic_pipeline.py
+[2026-01-09T16:05:06.525+0000] {processor.py:829} INFO - Processing file /opt/airflow/dags/diagnostic_pipeline.py for tasks to queue
+[2026-01-09T16:05:06.527+0000] {logging_mixin.py:154} INFO - [2026-01-09T16:05:06.527+0000] {dagbag.py:536} INFO - Filling up the DagBag from /opt/airflow/dags/diagnostic_pipeline.py
+[2026-01-09T16:05:10.046+0000] {processor.py:839} INFO - DAG(s) dict_keys(['diagnostic_pipeline']) retrieved from /opt/airflow/dags/diagnostic_pipeline.py
+[2026-01-09T16:05:10.096+0000] {logging_mixin.py:154} INFO - [2026-01-09T16:05:10.092+0000] {dag.py:2941} INFO - Sync 1 DAGs
+[2026-01-09T16:05:10.125+0000] {logging_mixin.py:154} INFO - [2026-01-09T16:05:10.125+0000] {dag.py:3722} INFO - Setting next_dagrun for diagnostic_pipeline to None, run_after=None
+[2026-01-09T16:05:10.159+0000] {processor.py:179} INFO - Processing /opt/airflow/dags/diagnostic_pipeline.py took 3.640 seconds
+[2026-01-09T16:05:40.429+0000] {processor.py:157} INFO - Started process (PID=3177) to work on /opt/airflow/dags/diagnostic_pipeline.py
+[2026-01-09T16:05:40.431+0000] {processor.py:829} INFO - Processing file /opt/airflow/dags/diagnostic_pipeline.py for tasks to queue
+[2026-01-09T16:05:40.432+0000] {logging_mixin.py:154} INFO - [2026-01-09T16:05:40.432+0000] {dagbag.py:536} INFO - Filling up the DagBag from /opt/airflow/dags/diagnostic_pipeline.py
+[2026-01-09T16:05:43.617+0000] {processor.py:839} INFO - DAG(s) dict_keys(['diagnostic_pipeline']) retrieved from /opt/airflow/dags/diagnostic_pipeline.py
+[2026-01-09T16:05:43.653+0000] {logging_mixin.py:154} INFO - [2026-01-09T16:05:43.652+0000] {dag.py:2941} INFO - Sync 1 DAGs
+[2026-01-09T16:05:43.672+0000] {logging_mixin.py:154} INFO - [2026-01-09T16:05:43.672+0000] {dag.py:3722} INFO - Setting next_dagrun for diagnostic_pipeline to None, run_after=None
+[2026-01-09T16:05:43.693+0000] {processor.py:179} INFO - Processing /opt/airflow/dags/diagnostic_pipeline.py took 3.269 seconds
+[2026-01-09T16:06:14.006+0000] {processor.py:157} INFO - Started process (PID=3195) to work on /opt/airflow/dags/diagnostic_pipeline.py
+[2026-01-09T16:06:14.008+0000] {processor.py:829} INFO - Processing file /opt/airflow/dags/diagnostic_pipeline.py for tasks to queue
+[2026-01-09T16:06:14.009+0000] {logging_mixin.py:154} INFO - [2026-01-09T16:06:14.009+0000] {dagbag.py:536} INFO - Filling up the DagBag from /opt/airflow/dags/diagnostic_pipeline.py
+[2026-01-09T16:06:19.181+0000] {processor.py:839} INFO - DAG(s) dict_keys(['diagnostic_pipeline']) retrieved from /opt/airflow/dags/diagnostic_pipeline.py
+[2026-01-09T16:06:19.225+0000] {logging_mixin.py:154} INFO - [2026-01-09T16:06:19.224+0000] {dag.py:2941} INFO - Sync 1 DAGs
+[2026-01-09T16:06:19.242+0000] {logging_mixin.py:154} INFO - [2026-01-09T16:06:19.242+0000] {dag.py:3722} INFO - Setting next_dagrun for diagnostic_pipeline to None, run_after=None
+[2026-01-09T16:06:19.274+0000] {processor.py:179} INFO - Processing /opt/airflow/dags/diagnostic_pipeline.py took 5.276 seconds
+[2026-01-09T16:06:49.593+0000] {processor.py:157} INFO - Started process (PID=3218) to work on /opt/airflow/dags/diagnostic_pipeline.py
+[2026-01-09T16:06:49.595+0000] {processor.py:829} INFO - Processing file /opt/airflow/dags/diagnostic_pipeline.py for tasks to queue
+[2026-01-09T16:06:49.596+0000] {logging_mixin.py:154} INFO - [2026-01-09T16:06:49.595+0000] {dagbag.py:536} INFO - Filling up the DagBag from /opt/airflow/dags/diagnostic_pipeline.py
+[2026-01-09T16:06:52.521+0000] {processor.py:839} INFO - DAG(s) dict_keys(['diagnostic_pipeline']) retrieved from /opt/airflow/dags/diagnostic_pipeline.py
+[2026-01-09T16:06:52.555+0000] {logging_mixin.py:154} INFO - [2026-01-09T16:06:52.554+0000] {dag.py:2941} INFO - Sync 1 DAGs
+[2026-01-09T16:06:52.569+0000] {logging_mixin.py:154} INFO - [2026-01-09T16:06:52.569+0000] {dag.py:3722} INFO - Setting next_dagrun for diagnostic_pipeline to None, run_after=None
+[2026-01-09T16:06:52.592+0000] {processor.py:179} INFO - Processing /opt/airflow/dags/diagnostic_pipeline.py took 3.003 seconds
+[2026-01-09T16:07:22.742+0000] {processor.py:157} INFO - Started process (PID=3236) to work on /opt/airflow/dags/diagnostic_pipeline.py
+[2026-01-09T16:07:22.744+0000] {processor.py:829} INFO - Processing file /opt/airflow/dags/diagnostic_pipeline.py for tasks to queue
+[2026-01-09T16:07:22.745+0000] {logging_mixin.py:154} INFO - [2026-01-09T16:07:22.745+0000] {dagbag.py:536} INFO - Filling up the DagBag from /opt/airflow/dags/diagnostic_pipeline.py
+[2026-01-09T16:07:26.308+0000] {processor.py:839} INFO - DAG(s) dict_keys(['diagnostic_pipeline']) retrieved from /opt/airflow/dags/diagnostic_pipeline.py
+[2026-01-09T16:07:26.358+0000] {logging_mixin.py:154} INFO - [2026-01-09T16:07:26.357+0000] {dag.py:2941} INFO - Sync 1 DAGs
+[2026-01-09T16:07:26.381+0000] {logging_mixin.py:154} INFO - [2026-01-09T16:07:26.381+0000] {dag.py:3722} INFO - Setting next_dagrun for diagnostic_pipeline to None, run_after=None
+[2026-01-09T16:07:26.405+0000] {processor.py:179} INFO - Processing /opt/airflow/dags/diagnostic_pipeline.py took 3.667 seconds
+[2026-01-09T16:07:56.825+0000] {processor.py:157} INFO - Started process (PID=3254) to work on /opt/airflow/dags/diagnostic_pipeline.py
+[2026-01-09T16:07:56.827+0000] {processor.py:829} INFO - Processing file /opt/airflow/dags/diagnostic_pipeline.py for tasks to queue
+[2026-01-09T16:07:56.829+0000] {logging_mixin.py:154} INFO - [2026-01-09T16:07:56.829+0000] {dagbag.py:536} INFO - Filling up the DagBag from /opt/airflow/dags/diagnostic_pipeline.py
+[2026-01-09T16:08:00.985+0000] {processor.py:839} INFO - DAG(s) dict_keys(['diagnostic_pipeline']) retrieved from /opt/airflow/dags/diagnostic_pipeline.py
+[2026-01-09T16:08:01.055+0000] {logging_mixin.py:154} INFO - [2026-01-09T16:08:01.054+0000] {dag.py:2941} INFO - Sync 1 DAGs
+[2026-01-09T16:08:01.087+0000] {logging_mixin.py:154} INFO - [2026-01-09T16:08:01.086+0000] {dag.py:3722} INFO - Setting next_dagrun for diagnostic_pipeline to None, run_after=None
+[2026-01-09T16:08:01.123+0000] {processor.py:179} INFO - Processing /opt/airflow/dags/diagnostic_pipeline.py took 4.303 seconds
+[2026-01-09T16:08:31.449+0000] {processor.py:157} INFO - Started process (PID=3272) to work on /opt/airflow/dags/diagnostic_pipeline.py
+[2026-01-09T16:08:31.451+0000] {processor.py:829} INFO - Processing file /opt/airflow/dags/diagnostic_pipeline.py for tasks to queue
+[2026-01-09T16:08:31.452+0000] {logging_mixin.py:154} INFO - [2026-01-09T16:08:31.452+0000] {dagbag.py:536} INFO - Filling up the DagBag from /opt/airflow/dags/diagnostic_pipeline.py
+[2026-01-09T16:08:34.578+0000] {processor.py:839} INFO - DAG(s) dict_keys(['diagnostic_pipeline']) retrieved from /opt/airflow/dags/diagnostic_pipeline.py
+[2026-01-09T16:08:34.610+0000] {logging_mixin.py:154} INFO - [2026-01-09T16:08:34.609+0000] {dag.py:2941} INFO - Sync 1 DAGs
+[2026-01-09T16:08:34.626+0000] {logging_mixin.py:154} INFO - [2026-01-09T16:08:34.626+0000] {dag.py:3722} INFO - Setting next_dagrun for diagnostic_pipeline to None, run_after=None
+[2026-01-09T16:08:34.648+0000] {processor.py:179} INFO - Processing /opt/airflow/dags/diagnostic_pipeline.py took 3.205 seconds
+[2026-01-09T16:09:05.102+0000] {processor.py:157} INFO - Started process (PID=3290) to work on /opt/airflow/dags/diagnostic_pipeline.py
+[2026-01-09T16:09:05.104+0000] {processor.py:829} INFO - Processing file /opt/airflow/dags/diagnostic_pipeline.py for tasks to queue
+[2026-01-09T16:09:05.105+0000] {logging_mixin.py:154} INFO - [2026-01-09T16:09:05.104+0000] {dagbag.py:536} INFO - Filling up the DagBag from /opt/airflow/dags/diagnostic_pipeline.py
+[2026-01-09T16:09:10.486+0000] {processor.py:839} INFO - DAG(s) dict_keys(['diagnostic_pipeline']) retrieved from /opt/airflow/dags/diagnostic_pipeline.py
+[2026-01-09T16:09:10.525+0000] {logging_mixin.py:154} INFO - [2026-01-09T16:09:10.524+0000] {dag.py:2941} INFO - Sync 1 DAGs
+[2026-01-09T16:09:10.542+0000] {logging_mixin.py:154} INFO - [2026-01-09T16:09:10.542+0000] {dag.py:3722} INFO - Setting next_dagrun for diagnostic_pipeline to None, run_after=None
+[2026-01-09T16:09:10.568+0000] {processor.py:179} INFO - Processing /opt/airflow/dags/diagnostic_pipeline.py took 5.471 seconds
+[2026-01-09T16:09:40.851+0000] {processor.py:157} INFO - Started process (PID=3308) to work on /opt/airflow/dags/diagnostic_pipeline.py
+[2026-01-09T16:09:40.853+0000] {processor.py:829} INFO - Processing file /opt/airflow/dags/diagnostic_pipeline.py for tasks to queue
+[2026-01-09T16:09:40.855+0000] {logging_mixin.py:154} INFO - [2026-01-09T16:09:40.854+0000] {dagbag.py:536} INFO - Filling up the DagBag from /opt/airflow/dags/diagnostic_pipeline.py
+[2026-01-09T16:09:43.896+0000] {processor.py:839} INFO - DAG(s) dict_keys(['diagnostic_pipeline']) retrieved from /opt/airflow/dags/diagnostic_pipeline.py
+[2026-01-09T16:09:43.933+0000] {logging_mixin.py:154} INFO - [2026-01-09T16:09:43.932+0000] {dag.py:2941} INFO - Sync 1 DAGs
+[2026-01-09T16:09:43.948+0000] {logging_mixin.py:154} INFO - [2026-01-09T16:09:43.948+0000] {dag.py:3722} INFO - Setting next_dagrun for diagnostic_pipeline to None, run_after=None
+[2026-01-09T16:09:43.969+0000] {processor.py:179} INFO - Processing /opt/airflow/dags/diagnostic_pipeline.py took 3.126 seconds
+[2026-01-09T16:10:14.260+0000] {processor.py:157} INFO - Started process (PID=3326) to work on /opt/airflow/dags/diagnostic_pipeline.py
+[2026-01-09T16:10:14.262+0000] {processor.py:829} INFO - Processing file /opt/airflow/dags/diagnostic_pipeline.py for tasks to queue
+[2026-01-09T16:10:14.263+0000] {logging_mixin.py:154} INFO - [2026-01-09T16:10:14.263+0000] {dagbag.py:536} INFO - Filling up the DagBag from /opt/airflow/dags/diagnostic_pipeline.py
+[2026-01-09T16:10:16.984+0000] {processor.py:839} INFO - DAG(s) dict_keys(['diagnostic_pipeline']) retrieved from /opt/airflow/dags/diagnostic_pipeline.py
+[2026-01-09T16:10:17.016+0000] {logging_mixin.py:154} INFO - [2026-01-09T16:10:17.016+0000] {dag.py:2941} INFO - Sync 1 DAGs
+[2026-01-09T16:10:17.032+0000] {logging_mixin.py:154} INFO - [2026-01-09T16:10:17.032+0000] {dag.py:3722} INFO - Setting next_dagrun for diagnostic_pipeline to None, run_after=None
+[2026-01-09T16:10:17.052+0000] {processor.py:179} INFO - Processing /opt/airflow/dags/diagnostic_pipeline.py took 2.796 seconds
+[2026-01-09T16:10:47.586+0000] {processor.py:157} INFO - Started process (PID=3344) to work on /opt/airflow/dags/diagnostic_pipeline.py
+[2026-01-09T16:10:47.588+0000] {processor.py:829} INFO - Processing file /opt/airflow/dags/diagnostic_pipeline.py for tasks to queue
+[2026-01-09T16:10:47.589+0000] {logging_mixin.py:154} INFO - [2026-01-09T16:10:47.588+0000] {dagbag.py:536} INFO - Filling up the DagBag from /opt/airflow/dags/diagnostic_pipeline.py
+[2026-01-09T16:10:50.843+0000] {processor.py:839} INFO - DAG(s) dict_keys(['diagnostic_pipeline']) retrieved from /opt/airflow/dags/diagnostic_pipeline.py
+[2026-01-09T16:10:50.883+0000] {logging_mixin.py:154} INFO - [2026-01-09T16:10:50.882+0000] {dag.py:2941} INFO - Sync 1 DAGs
+[2026-01-09T16:10:50.912+0000] {logging_mixin.py:154} INFO - [2026-01-09T16:10:50.912+0000] {dag.py:3722} INFO - Setting next_dagrun for diagnostic_pipeline to None, run_after=None
+[2026-01-09T16:10:50.935+0000] {processor.py:179} INFO - Processing /opt/airflow/dags/diagnostic_pipeline.py took 3.353 seconds
+[2026-01-09T16:11:21.103+0000] {processor.py:157} INFO - Started process (PID=3362) to work on /opt/airflow/dags/diagnostic_pipeline.py
+[2026-01-09T16:11:21.105+0000] {processor.py:829} INFO - Processing file /opt/airflow/dags/diagnostic_pipeline.py for tasks to queue
+[2026-01-09T16:11:21.107+0000] {logging_mixin.py:154} INFO - [2026-01-09T16:11:21.106+0000] {dagbag.py:536} INFO - Filling up the DagBag from /opt/airflow/dags/diagnostic_pipeline.py
+[2026-01-09T16:11:25.620+0000] {processor.py:839} INFO - DAG(s) dict_keys(['diagnostic_pipeline']) retrieved from /opt/airflow/dags/diagnostic_pipeline.py
+[2026-01-09T16:11:25.684+0000] {logging_mixin.py:154} INFO - [2026-01-09T16:11:25.682+0000] {dag.py:2941} INFO - Sync 1 DAGs
+[2026-01-09T16:11:25.783+0000] {logging_mixin.py:154} INFO - [2026-01-09T16:11:25.782+0000] {dag.py:3722} INFO - Setting next_dagrun for diagnostic_pipeline to None, run_after=None
+[2026-01-09T16:11:25.824+0000] {processor.py:179} INFO - Processing /opt/airflow/dags/diagnostic_pipeline.py took 4.726 seconds
+[2026-01-09T16:11:56.108+0000] {processor.py:157} INFO - Started process (PID=3385) to work on /opt/airflow/dags/diagnostic_pipeline.py
+[2026-01-09T16:11:56.111+0000] {processor.py:829} INFO - Processing file /opt/airflow/dags/diagnostic_pipeline.py for tasks to queue
+[2026-01-09T16:11:56.112+0000] {logging_mixin.py:154} INFO - [2026-01-09T16:11:56.112+0000] {dagbag.py:536} INFO - Filling up the DagBag from /opt/airflow/dags/diagnostic_pipeline.py
+[2026-01-09T16:12:02.988+0000] {processor.py:839} INFO - DAG(s) dict_keys(['diagnostic_pipeline']) retrieved from /opt/airflow/dags/diagnostic_pipeline.py
+[2026-01-09T16:12:03.111+0000] {logging_mixin.py:154} INFO - [2026-01-09T16:12:03.110+0000] {dag.py:2941} INFO - Sync 1 DAGs
+[2026-01-09T16:12:03.170+0000] {logging_mixin.py:154} INFO - [2026-01-09T16:12:03.169+0000] {dag.py:3722} INFO - Setting next_dagrun for diagnostic_pipeline to None, run_after=None
+[2026-01-09T16:12:03.240+0000] {processor.py:179} INFO - Processing /opt/airflow/dags/diagnostic_pipeline.py took 7.139 seconds
+[2026-01-09T16:12:34.023+0000] {processor.py:157} INFO - Started process (PID=3403) to work on /opt/airflow/dags/diagnostic_pipeline.py
+[2026-01-09T16:12:34.026+0000] {processor.py:829} INFO - Processing file /opt/airflow/dags/diagnostic_pipeline.py for tasks to queue
+[2026-01-09T16:12:34.028+0000] {logging_mixin.py:154} INFO - [2026-01-09T16:12:34.028+0000] {dagbag.py:536} INFO - Filling up the DagBag from /opt/airflow/dags/diagnostic_pipeline.py
+[2026-01-09T16:12:39.073+0000] {processor.py:839} INFO - DAG(s) dict_keys(['diagnostic_pipeline']) retrieved from /opt/airflow/dags/diagnostic_pipeline.py
+[2026-01-09T16:12:39.113+0000] {logging_mixin.py:154} INFO - [2026-01-09T16:12:39.112+0000] {dag.py:2941} INFO - Sync 1 DAGs
+[2026-01-09T16:12:39.129+0000] {logging_mixin.py:154} INFO - [2026-01-09T16:12:39.129+0000] {dag.py:3722} INFO - Setting next_dagrun for diagnostic_pipeline to None, run_after=None
+[2026-01-09T16:12:39.156+0000] {processor.py:179} INFO - Processing /opt/airflow/dags/diagnostic_pipeline.py took 5.142 seconds
+[2026-01-09T16:13:09.413+0000] {processor.py:157} INFO - Started process (PID=3421) to work on /opt/airflow/dags/diagnostic_pipeline.py
+[2026-01-09T16:13:09.415+0000] {processor.py:829} INFO - Processing file /opt/airflow/dags/diagnostic_pipeline.py for tasks to queue
+[2026-01-09T16:13:09.417+0000] {logging_mixin.py:154} INFO - [2026-01-09T16:13:09.416+0000] {dagbag.py:536} INFO - Filling up the DagBag from /opt/airflow/dags/diagnostic_pipeline.py
+[2026-01-09T16:13:12.459+0000] {processor.py:839} INFO - DAG(s) dict_keys(['diagnostic_pipeline']) retrieved from /opt/airflow/dags/diagnostic_pipeline.py
+[2026-01-09T16:13:12.492+0000] {logging_mixin.py:154} INFO - [2026-01-09T16:13:12.491+0000] {dag.py:2941} INFO - Sync 1 DAGs
+[2026-01-09T16:13:12.507+0000] {logging_mixin.py:154} INFO - [2026-01-09T16:13:12.507+0000] {dag.py:3722} INFO - Setting next_dagrun for diagnostic_pipeline to None, run_after=None
+[2026-01-09T16:13:12.531+0000] {processor.py:179} INFO - Processing /opt/airflow/dags/diagnostic_pipeline.py took 3.124 seconds
+[2026-01-09T16:13:42.805+0000] {processor.py:157} INFO - Started process (PID=3439) to work on /opt/airflow/dags/diagnostic_pipeline.py
+[2026-01-09T16:13:42.806+0000] {processor.py:829} INFO - Processing file /opt/airflow/dags/diagnostic_pipeline.py for tasks to queue
+[2026-01-09T16:13:42.808+0000] {logging_mixin.py:154} INFO - [2026-01-09T16:13:42.808+0000] {dagbag.py:536} INFO - Filling up the DagBag from /opt/airflow/dags/diagnostic_pipeline.py
+[2026-01-09T16:13:47.129+0000] {processor.py:839} INFO - DAG(s) dict_keys(['diagnostic_pipeline']) retrieved from /opt/airflow/dags/diagnostic_pipeline.py
+[2026-01-09T16:13:47.195+0000] {logging_mixin.py:154} INFO - [2026-01-09T16:13:47.193+0000] {dag.py:2941} INFO - Sync 1 DAGs
+[2026-01-09T16:13:47.225+0000] {logging_mixin.py:154} INFO - [2026-01-09T16:13:47.225+0000] {dag.py:3722} INFO - Setting next_dagrun for diagnostic_pipeline to None, run_after=None
+[2026-01-09T16:13:47.266+0000] {processor.py:179} INFO - Processing /opt/airflow/dags/diagnostic_pipeline.py took 4.469 seconds
+[2026-01-09T16:14:17.555+0000] {processor.py:157} INFO - Started process (PID=3457) to work on /opt/airflow/dags/diagnostic_pipeline.py
+[2026-01-09T16:14:17.557+0000] {processor.py:829} INFO - Processing file /opt/airflow/dags/diagnostic_pipeline.py for tasks to queue
+[2026-01-09T16:14:17.558+0000] {logging_mixin.py:154} INFO - [2026-01-09T16:14:17.558+0000] {dagbag.py:536} INFO - Filling up the DagBag from /opt/airflow/dags/diagnostic_pipeline.py
+[2026-01-09T16:14:22.604+0000] {processor.py:839} INFO - DAG(s) dict_keys(['diagnostic_pipeline']) retrieved from /opt/airflow/dags/diagnostic_pipeline.py
+[2026-01-09T16:14:22.650+0000] {logging_mixin.py:154} INFO - [2026-01-09T16:14:22.649+0000] {dag.py:2941} INFO - Sync 1 DAGs
+[2026-01-09T16:14:22.677+0000] {logging_mixin.py:154} INFO - [2026-01-09T16:14:22.676+0000] {dag.py:3722} INFO - Setting next_dagrun for diagnostic_pipeline to None, run_after=None
+[2026-01-09T16:14:22.707+0000] {processor.py:179} INFO - Processing /opt/airflow/dags/diagnostic_pipeline.py took 5.157 seconds
+[2026-01-09T16:14:53.023+0000] {processor.py:157} INFO - Started process (PID=3475) to work on /opt/airflow/dags/diagnostic_pipeline.py
+[2026-01-09T16:14:53.025+0000] {processor.py:829} INFO - Processing file /opt/airflow/dags/diagnostic_pipeline.py for tasks to queue
+[2026-01-09T16:14:53.026+0000] {logging_mixin.py:154} INFO - [2026-01-09T16:14:53.026+0000] {dagbag.py:536} INFO - Filling up the DagBag from /opt/airflow/dags/diagnostic_pipeline.py
+[2026-01-09T16:14:56.076+0000] {processor.py:839} INFO - DAG(s) dict_keys(['diagnostic_pipeline']) retrieved from /opt/airflow/dags/diagnostic_pipeline.py
+[2026-01-09T16:14:56.111+0000] {logging_mixin.py:154} INFO - [2026-01-09T16:14:56.110+0000] {dag.py:2941} INFO - Sync 1 DAGs
+[2026-01-09T16:14:56.128+0000] {logging_mixin.py:154} INFO - [2026-01-09T16:14:56.128+0000] {dag.py:3722} INFO - Setting next_dagrun for diagnostic_pipeline to None, run_after=None
+[2026-01-09T16:14:56.151+0000] {processor.py:179} INFO - Processing /opt/airflow/dags/diagnostic_pipeline.py took 3.134 seconds
+[2026-01-09T16:15:26.505+0000] {processor.py:157} INFO - Started process (PID=3493) to work on /opt/airflow/dags/diagnostic_pipeline.py
+[2026-01-09T16:15:26.506+0000] {processor.py:829} INFO - Processing file /opt/airflow/dags/diagnostic_pipeline.py for tasks to queue
+[2026-01-09T16:15:26.509+0000] {logging_mixin.py:154} INFO - [2026-01-09T16:15:26.508+0000] {dagbag.py:536} INFO - Filling up the DagBag from /opt/airflow/dags/diagnostic_pipeline.py
+[2026-01-09T16:15:32.112+0000] {processor.py:839} INFO - DAG(s) dict_keys(['diagnostic_pipeline']) retrieved from /opt/airflow/dags/diagnostic_pipeline.py
+[2026-01-09T16:15:32.196+0000] {logging_mixin.py:154} INFO - [2026-01-09T16:15:32.196+0000] {dag.py:2941} INFO - Sync 1 DAGs
+[2026-01-09T16:15:32.223+0000] {logging_mixin.py:154} INFO - [2026-01-09T16:15:32.223+0000] {dag.py:3722} INFO - Setting next_dagrun for diagnostic_pipeline to None, run_after=None
+[2026-01-09T16:15:32.275+0000] {processor.py:179} INFO - Processing /opt/airflow/dags/diagnostic_pipeline.py took 5.776 seconds
+[2026-01-09T16:16:02.585+0000] {processor.py:157} INFO - Started process (PID=3516) to work on /opt/airflow/dags/diagnostic_pipeline.py
+[2026-01-09T16:16:02.587+0000] {processor.py:829} INFO - Processing file /opt/airflow/dags/diagnostic_pipeline.py for tasks to queue
+[2026-01-09T16:16:02.588+0000] {logging_mixin.py:154} INFO - [2026-01-09T16:16:02.588+0000] {dagbag.py:536} INFO - Filling up the DagBag from /opt/airflow/dags/diagnostic_pipeline.py
+[2026-01-09T16:16:06.253+0000] {processor.py:839} INFO - DAG(s) dict_keys(['diagnostic_pipeline']) retrieved from /opt/airflow/dags/diagnostic_pipeline.py
+[2026-01-09T16:16:06.286+0000] {logging_mixin.py:154} INFO - [2026-01-09T16:16:06.285+0000] {dag.py:2941} INFO - Sync 1 DAGs
+[2026-01-09T16:16:06.302+0000] {logging_mixin.py:154} INFO - [2026-01-09T16:16:06.302+0000] {dag.py:3722} INFO - Setting next_dagrun for diagnostic_pipeline to None, run_after=None
+[2026-01-09T16:16:06.324+0000] {processor.py:179} INFO - Processing /opt/airflow/dags/diagnostic_pipeline.py took 3.745 seconds
+[2026-01-09T16:16:36.696+0000] {processor.py:157} INFO - Started process (PID=3534) to work on /opt/airflow/dags/diagnostic_pipeline.py
+[2026-01-09T16:16:36.698+0000] {processor.py:829} INFO - Processing file /opt/airflow/dags/diagnostic_pipeline.py for tasks to queue
+[2026-01-09T16:16:36.699+0000] {logging_mixin.py:154} INFO - [2026-01-09T16:16:36.699+0000] {dagbag.py:536} INFO - Filling up the DagBag from /opt/airflow/dags/diagnostic_pipeline.py
+[2026-01-09T16:16:39.499+0000] {processor.py:839} INFO - DAG(s) dict_keys(['diagnostic_pipeline']) retrieved from /opt/airflow/dags/diagnostic_pipeline.py
+[2026-01-09T16:16:39.532+0000] {logging_mixin.py:154} INFO - [2026-01-09T16:16:39.531+0000] {dag.py:2941} INFO - Sync 1 DAGs
+[2026-01-09T16:16:39.547+0000] {logging_mixin.py:154} INFO - [2026-01-09T16:16:39.547+0000] {dag.py:3722} INFO - Setting next_dagrun for diagnostic_pipeline to None, run_after=None
+[2026-01-09T16:16:39.568+0000] {processor.py:179} INFO - Processing /opt/airflow/dags/diagnostic_pipeline.py took 2.879 seconds
