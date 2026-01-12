@@ -10,8 +10,6 @@ from airflow.operators.python import PythonOperator
 from airflow.utils.dates import days_ago
 from datetime import timedelta
 import os
-import shutil
-from pathlib import Path
 from pymongo import MongoClient
 import logging
 
@@ -38,23 +36,23 @@ logger = logging.getLogger(__name__)
 def cleanup_gradcam_cache(**context):
     """Supprime les fichiers Grad-CAM temporaires de plus de 7 jours."""
     logger.info("[Maintenance] Nettoyage du cache Grad-CAM...")
-    
+
     gradcam_cache_dir = '/app/gradcam_cache'
     if not os.path.exists(gradcam_cache_dir):
         logger.info(f"Répertoire {gradcam_cache_dir} n'existe pas")
         return {'status': 'ok', 'deleted_files': 0}
-    
+
     try:
         deleted_count = 0
         now = context['execution_date'].timestamp()
         max_age_seconds = 7 * 24 * 3600  # 7 jours
-        
+
         for filename in os.listdir(gradcam_cache_dir):
             file_path = os.path.join(gradcam_cache_dir, filename)
-            
+
             if os.path.isfile(file_path):
                 file_age = now - os.path.getmtime(file_path)
-                
+
                 if file_age > max_age_seconds:
                     try:
                         os.remove(file_path)

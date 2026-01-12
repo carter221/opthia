@@ -55,27 +55,27 @@ jobs:
     
     - name: Build Backend image
       run: |
-        echo "🔨 Building Backend image..."
+        echo " Building Backend image..."
         docker build -t ophtia-backend:test ./backend
     
     - name: Build Frontend image
       run: |
-        echo "🔨 Building Frontend image..."
+        echo " Building Frontend image..."
         docker build -t ophtia-frontend:test ./frontend
     
     - name: Build Worker image
       run: |
-        echo "🔨 Building Worker image..."
+        echo " Building Worker image..."
         docker build -t ophtia-worker-1:test ./backend
     
     - name: Build Airflow image
       run: |
-        echo "🔨 Building Airflow image..."
+        echo " Building Airflow image..."
         docker build -t ophtia-airflow:test ./airflow
     
     - name: Verify images exist
       run: |
-        echo "✅ Images built successfully"
+        echo " Images built successfully"
         docker images | grep ophtia
 
   docker-compose:
@@ -97,34 +97,34 @@ jobs:
     
     - name: Start services with docker-compose
       run: |
-        echo "🚀 Starting Docker Compose services..."
+        echo " Starting Docker Compose services..."
         docker compose -f docker-compose.yml up -d --wait || docker compose -f docker-compose.yml up -d
         sleep 10
     
     - name: Check MongoDB health
       run: |
-        echo "📊 Checking MongoDB..."
+        echo " Checking MongoDB..."
         docker exec ophtia-mongo-1 mongosh --eval "db.adminCommand('ping')" || echo "MongoDB check passed"
     
     - name: Check RabbitMQ health
       run: |
-        echo "🐰 Checking RabbitMQ..."
+        echo " Checking RabbitMQ..."
         docker exec ophtia-rabbitmq-1 rabbitmq-diagnostics -q ping || echo "RabbitMQ check passed"
     
     - name: Check Backend health
       run: |
-        echo "🏥 Checking Backend API..."
+        echo " Checking Backend API..."
         docker exec ophtia-backend-1 curl -f http://localhost:5000/health || echo "Backend health check passed"
     
     - name: Check services status
       run: |
-        echo "📋 Docker services status:"
+        echo " Docker services status:"
         docker compose ps
     
     - name: View logs if failed
       if: failure()
       run: |
-        echo "❌ Service logs:"
+        echo " Service logs:"
         docker compose logs --tail=50
     
     - name: Cleanup
@@ -142,7 +142,7 @@ jobs:
     steps:
     - name: Check job status
       run: |
-        echo "✅ CI Pipeline Summary"
+        echo " CI Pipeline Summary"
         echo "- Linting: ${{ needs.lint.result }}"
         echo "- Docker Build: ${{ needs.docker-build.result }}"
         echo "- Docker Compose: ${{ needs.docker-compose.result }}"
