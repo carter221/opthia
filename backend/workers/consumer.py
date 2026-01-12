@@ -122,31 +122,27 @@ def init_models():
     rd_model_path = 'models/best_dr_model.pth'
     if os.path.exists(rd_model_path):
         try:
-            rd_model = models.resnet50(weights=None)
-            num_features = rd_model.fc.in_features
-            rd_model.fc = nn.Sequential(
-                nn.Linear(num_features, 512),
-                nn.ReLU(),
-                nn.Dropout(0.5),
-                nn.Linear(512, 5)
-            )
+            # Créer le modèle avec la même architecture que lors de l'entraînement
+            class DRClassifier(nn.Module):
+                def __init__(self, num_classes=5, pretrained=False):
+                    super(DRClassifier, self).__init__()
+                    self.backbone = models.resnet50(weights='DEFAULT' if pretrained else None)
+                    num_features = self.backbone.fc.in_features
+                    self.backbone.fc = nn.Linear(num_features, num_classes)
+                
+                def forward(self, x):
+                    return self.backbone(x)
             
-            checkpoint = torch.load(rd_model_path, map_location=device)
-            state_dict = checkpoint.get('model_state_dict', checkpoint)
+            rd_model = DRClassifier(num_classes=5, pretrained=False)
             
-            from collections import OrderedDict
-            new_state_dict = OrderedDict()
-            for k, v in state_dict.items():
-                if k.startswith('backbone.'):
-                    new_state_dict[k[9:]] = v
-                else:
-                    new_state_dict[k] = v
+            # Charger les poids
+            state_dict = torch.load(rd_model_path, map_location=device)
+            rd_model.load_state_dict(state_dict, strict=True)
             
-            rd_model.load_state_dict(new_state_dict, strict=False)
             rd_model.to(device)
             rd_model.eval()
             models_cache['rd'] = rd_model
-            logger.info("✓ Modèle RD chargé")
+            logger.info("✓ Modèle RD chargé avec succès")
         except Exception as e:
             logger.error(f"✗ Erreur RD: {e}")
             raise
@@ -286,7 +282,7 @@ def process_diagnostic_task(task_data):
         # Générer Grad-CAM
         try:
             if model_type == 'rd':
-                target_layer = model.layer4
+                target_layer = model.backbone.layer4
             else:
                 target_layer = model.features[-1]
             

@@ -197,31 +197,48 @@ def index():
 def predict_with_gradcam():
     """
     Endpoint qui envoie la tâche de diagnostic au worker RabbitMQ.
+    Accepte JSON ou multipart/form-data.
     Retourne une task_id pour polling des résultats.
     """
-    if 'file' not in request.files:
-        return jsonify({'error': 'Aucun fichier fourni'}), 400
-
-    file = request.files['file']
-    model_type = request.form.get('model_type', 'rd')
-
-    if model_type not in ['rd', 'glaucoma']:
-        return jsonify({'error': 'model_type doit être "rd" ou "glaucoma"'}), 400
-
+    task_id = str(uuid.uuid4())
+    
     try:
-        # Génération ID unique
-        task_id = str(uuid.uuid4())
-        
-        # Encodage image en base64
-        image_bytes = file.read()
-        image_base64 = "data:image/png;base64," + __import__('base64').b64encode(image_bytes).decode('utf-8')
+        # Supporter à la fois JSON et multipart/form-data
+        if request.is_json:
+            # Format JSON (depuis Streamlit corrigé)
+            data = request.get_json()
+            image_base64 = data.get('image_base64')
+            model_type = data.get('model_type', 'rd')
+            filename = 'image.png'
+            
+            if not image_base64:
+                return jsonify({'error': 'image_base64 manquant'}), 400
+            
+            # Vérifier si le base64 a le préfixe data:
+            if not image_base64.startswith('data:'):
+                image_base64 = f"data:image/png;base64,{image_base64}"
+        else:
+            # Format multipart/form-data (ancien format)
+            if 'file' not in request.files:
+                return jsonify({'error': 'Aucun fichier fourni'}), 400
+
+            file = request.files['file']
+            model_type = request.form.get('model_type', 'rd')
+            filename = file.filename
+            
+            # Encodage image en base64
+            image_bytes = file.read()
+            image_base64 = "data:image/png;base64," + __import__('base64').b64encode(image_bytes).decode('utf-8')
+
+        if model_type not in ['rd', 'glaucoma']:
+            return jsonify({'error': 'model_type doit être "rd" ou "glaucoma"'}), 400
         
         # Préparer la tâche
         task_data = {
             'task_id': task_id,
             'image_base64': image_base64,
             'model_type': model_type,
-            'filename': file.filename
+            'filename': filename
         }
         
         # Envoyer à RabbitMQ
@@ -241,8 +258,6 @@ def predict_with_gradcam():
     except Exception as e:
         print(f"[✗] Erreur endpoint /predict_with_gradcam: {e}")
         return jsonify({'error': f"Erreur : {str(e)}"}), 500
-
-        return jsonify({'error': f"Erreur lors de la prédiction Grad-CAM : {str(e)}"}), 500
 
 @app.route('/result/<task_id>', methods=['GET'])
 def get_result(task_id):

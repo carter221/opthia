@@ -42,7 +42,6 @@ if uploaded_file is not None:
             byte_im = buf.getvalue()
 
             # Adresse de l'API backend
-            backend_url_predict = 'http://backend:5000/predict'
             backend_url_gradcam = 'http://backend:5000/predict_with_gradcam'
             
             multipart_payload = {
@@ -51,11 +50,11 @@ if uploaded_file is not None:
             }
 
             try:
-                # Prédiction avec ou sans Grad-CAM
-                if show_gradcam:
-                    response = requests.post(backend_url_gradcam, files=multipart_payload)
-                else:
-                    response = requests.post(backend_url_predict, files=multipart_payload)
+                # Prédiction avec Grad-CAM (endpoint unique)
+                response = requests.post(backend_url_gradcam, json={
+                    'image_base64': base64.b64encode(byte_im).decode('utf-8'),
+                    'model_type': model_type
+                })
                 
                 # Gérer le 202 (soumis) et attendre le résultat
                 if response.status_code == 202:
