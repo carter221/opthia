@@ -45,7 +45,8 @@ db = None
 
 def init_models_and_db():
     """Initialise les modèles et la connexion MongoDB."""
-    global models_cache, db
+    global models_cache
+    global db
 
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     models_cache['device'] = device
@@ -169,7 +170,8 @@ def process_diagnostic(**context):
 
     print(f"[*] Traitement diagnostic: task_id={task_id}, model={model_type}")
 
-    global models_cache, db
+    global models_cache
+    global db
 
     try:
         # Décodage image

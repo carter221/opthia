@@ -60,10 +60,10 @@ def cleanup_gradcam_cache(**context):
                         logger.info(f"Supprimé: {filename}")
                     except Exception as e:
                         logger.warning(f"Impossible de supprimer {filename}: {e}")
-        
+
         logger.info(f"✓ Nettoyage Grad-CAM: {deleted_count} fichiers supprimés")
         return {'status': 'ok', 'deleted_files': deleted_count}
-        
+
     except Exception as e:
         logger.error(f"✗ Erreur nettoyage cache: {e}")
         raise
@@ -72,79 +72,79 @@ def cleanup_gradcam_cache(**context):
 def cleanup_mongodb(**context):
     """Nettoie la base MongoDB: supprime les résultats de diagnostic de plus de 30 jours."""
     logger.info("[Maintenance] Nettoyage MongoDB...")
-    
+
     mongo_uri = os.environ.get('MONGO_URI', 'mongodb://mongo:27017/ophtia')
-    
+
     try:
         db_client = MongoClient(mongo_uri)
         db = db_client.get_default_database()
-        
+
         # Récupérer la date limite (30 jours en arrière)
         from datetime import datetime
         cutoff_date = datetime.utcnow() - timedelta(days=30)
-        
+
         # Supprimer les anciens résultats
         result = db.diagnostic_results.delete_many({
             'timestamp': {'$lt': cutoff_date},
             'status': 'completed'
         })
-        
+
         logger.info(f"✓ MongoDB nettoyé: {result.deleted_count} documents supprimés")
-        
+
         # Optimiser les indices
         db.diagnostic_results.create_index('task_id')
         db.diagnostic_results.create_index('timestamp')
-        
+
         logger.info("✓ Indices MongoDB optimisés")
-        
+
         return {'status': 'ok', 'deleted_documents': result.deleted_count}
-        
+
     except Exception as e:
         logger.error(f"✗ Erreur MongoDB: {e}")
         raise
     finally:
         try:
             db_client.close()
-        except:
+        except Exception:
             pass
 
 
 def backup_mongodb(**context):
     """Crée une sauvegarde de la base MongoDB."""
     logger.info("[Maintenance] Sauvegarde MongoDB...")
-    
+
     mongo_uri = os.environ.get('MONGO_URI', 'mongodb://mongo:27017/ophtia')
     backup_dir = '/app/backups'
-    
+
     try:
         # Créer le répertoire de backup s'il n'existe pas
         os.makedirs(backup_dir, exist_ok=True)
-        
+
         db_client = MongoClient(mongo_uri)
         db = db_client.get_default_database()
-        
+
         # Créer un dump JSON de la collection diagnostic_results
         from datetime import datetime
         timestamp = datetime.utcnow().strftime('%Y%m%d_%H%M%S')
         backup_file = os.path.join(backup_dir, f'diagnostic_results_backup_{timestamp}.json')
-        
+
         import json
         from bson import json_util
-        
+
         diagnostics = list(db.diagnostic_results.find())
-        
+
         with open(backup_file, 'w') as f:
             json.dump(diagnostics, f, default=json_util.default, indent=2)
-        
+
         file_size = os.path.getsize(backup_file) / (1024 * 1024)  # En MB
         logger.info(f"✓ Sauvegarde créée: {backup_file} ({file_size:.2f} MB)")
-        
+
         # Garder seulement les 7 dernières sauvegardes
         backup_files = sorted(
             [f for f in os.listdir(backup_dir) if f.startswith('diagnostic_results_backup_')],
             reverse=True
         )
-        
+
         if len(backup_files) > 7:
             for old_backup in backup_files[7:]:
                 old_path = os.path.join(backup_dir, old_backup)
@@ -153,16 +153,16 @@ def backup_mongodb(**context):
                     logger.info(f"Ancien backup supprimé: {old_backup}")
                 except Exception as e:
                     logger.warning(f"Impossible de supprimer {old_backup}: {e}")
-        
+
         return {'status': 'ok', 'backup_file': backup_file, 'size_mb': file_size}
-        
+
     except Exception as e:
         logger.error(f"✗ Erreur sauvegarde: {e}")
         raise
     finally:
         try:
             db_client.close()
-        except:
+        except Exception:
             pass
 
 
@@ -171,27 +171,27 @@ def log_maintenance_summary(**context):
     logger.info("════════════════════════════════════════")
     logger.info("   RÉSUMÉ MAINTENANCE")
     logger.info("════════════════════════════════════════")
-    
+
     ti = context['task_instance']
-    
+
     try:
         gradcam_result = ti.xcom_pull(task_ids='cleanup_gradcam')
         logger.info(f"✓ Grad-CAM: {gradcam_result['deleted_files']} fichiers supprimés")
-    except:
+    except Exception:
         logger.warning("! Grad-CAM: résultat indisponible")
-    
+
     try:
         mongodb_result = ti.xcom_pull(task_ids='cleanup_mongodb')
         logger.info(f"✓ MongoDB: {mongodb_result['deleted_documents']} documents supprimés")
-    except:
+    except Exception:
         logger.warning("! MongoDB cleanup: résultat indisponible")
-    
+
     try:
         backup_result = ti.xcom_pull(task_ids='backup_mongodb')
         logger.info(f"✓ Backup: {backup_result['size_mb']:.2f} MB sauvegardés")
-    except:
+    except Exception:
         logger.warning("! Backup: résultat indisponible")
-    
+
     logger.info("════════════════════════════════════════")
 
 
