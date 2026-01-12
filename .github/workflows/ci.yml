@@ -89,6 +89,12 @@ jobs:
     - name: Set up Docker Buildx
       uses: docker/setup-buildx-action@v2
     
+    - name: Clean up Docker cache
+      run: |
+        echo "🧹 Cleaning up Docker cache to free space..."
+        docker system prune -af --volumes || true
+        docker builder prune -af || true
+    
     - name: Build all images
       run: |
         docker build -t ophtia-backend:test ./backend
