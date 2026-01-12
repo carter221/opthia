@@ -37,6 +37,7 @@ def crop_image_from_gray(img, tol=10):
             img = np.stack([img1, img2, img3], axis=-1)
         return img
 
+
 # --- CONFIGURATION ET CONNEXIONS ---
 
 # Design Pattern Singleton pour les modèles et la connexion DB
@@ -189,15 +190,16 @@ def load_models():
     else:
         print(f"AVERTISSEMENT: Le fichier du modèle {rd_model_path} n'a pas été trouvé.")
 
+
 # --- ENDPOINTS DE L'API ---
 
-@app.route('/', methods=['GET'])
 
+@app.route('/', methods=['GET'])
 def index():
     return "Backend de diagnostic ophtalmologique est en cours d'exécution!"
 
-@app.route('/predict_with_gradcam', methods=['POST'])
 
+@app.route('/predict_with_gradcam', methods=['POST'])
 def predict_with_gradcam():
     """
     Endpoint qui envoie la tâche de diagnostic au worker RabbitMQ.
@@ -232,7 +234,9 @@ def predict_with_gradcam():
 
             # Encodage image en base64
             image_bytes = file.read()
-            image_base64 = "data:image/png;base64," + __import__('base64').b64encode(image_bytes).decode('utf-8')
+            b64_module = __import__('base64')
+            encoded = b64_module.b64encode(image_bytes)
+            image_base64 = "data:image/png;base64," + encoded.decode('utf-8')
 
         if model_type not in ['rd', 'glaucoma']:
             return jsonify({'error': 'model_type doit être "rd" ou "glaucoma"'}), 400
@@ -263,8 +267,8 @@ def predict_with_gradcam():
         print(f"[✗] Erreur endpoint /predict_with_gradcam: {e}")
         return jsonify({'error': f"Erreur : {str(e)}"}), 500
 
-@app.route('/result/<task_id>', methods=['GET'])
 
+@app.route('/result/<task_id>', methods=['GET'])
 def get_result(task_id):
     """Récupère le résultat d'une tâche Airflow via MongoDB."""
     try:
@@ -284,7 +288,6 @@ def get_result(task_id):
 
 
 @app.route('/health', methods=['GET'])
-
 def health_check():
     """Endpoint de santé pour Docker."""
     return jsonify({

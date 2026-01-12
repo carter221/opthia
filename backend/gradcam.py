@@ -85,7 +85,8 @@ def apply_heatmap_to_image(image_np, cam, alpha=0.5, resize_to=None):
         image_np: Image originale (H, W, 3) en RGB
         cam: Heatmap Grad-CAM (H_feat, W_feat)
         alpha: Transparence de la heatmap (0-1)
-        resize_to: Dimension cible (width, height) pour réduire l'image. None = pas de redimensionnement
+        resize_to: Dimension cible (width, height) pour réduire l'image.
+                   None = pas de redimensionnement
 
     Returns:
         result_image: Image avec heatmap superposée
