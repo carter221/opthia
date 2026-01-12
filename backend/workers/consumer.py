@@ -18,7 +18,6 @@ from pymongo import MongoClient
 import logging
 from datetime import datetime
 import albumentations as A
-from albumentations.pytorch import ToTensorV2
 import torchvision.transforms as transforms
 import signal
 import sys
@@ -112,7 +111,7 @@ rabbitmq_channel = None
 
 def init_models():
     """Initialise les modèles PyTorch."""
-    global models_cache
+    global models_cache  # noqa: F824
 
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     models_cache['device'] = device
@@ -187,7 +186,8 @@ def init_mongodb():
 
 def init_rabbitmq():
     """Initialise la connexion à RabbitMQ."""
-    global rabbitmq_connection, rabbitmq_channel
+    global rabbitmq_connection
+    global rabbitmq_channel
 
     rabbitmq_url = os.environ.get('RABBITMQ_URL', 'amqp://guest:guest@rabbitmq:5672/%2F')
     try:
@@ -319,7 +319,9 @@ def process_diagnostic_task(task_data):
                         'class_3': float(probabilities[0, 3].item()),
                         'class_4': float(probabilities[0, 4].item()),
                     },
-                    'recommendation': "⚠️ RÉTINOPATHIE DÉTECTÉE" if prediction_binary == 1 else "✅ Aucune RD",
+                    'recommendation': ("⚠️ RÉTINOPATHIE DÉTECTÉE" if
+                                       prediction_binary == 1
+                                       else "✅ Aucune RD"),
                     'grad_cam': grad_cam_base64,
                 }
 
@@ -338,7 +340,8 @@ def process_diagnostic_task(task_data):
                 result_data = {
                     'prediction_class': int(prediction),
                     'probability': probability,
-                    'recommendation': "⚠️ GLAUCOME DÉTECTÉ" if prediction == 1 else "✅ Aucun glaucome",
+                    'recommendation': ("⚠️ GLAUCOME DÉTECTÉ" if prediction == 1
+                                       else "✅ Aucun glaucome"),
                     'grad_cam': grad_cam_base64,
                 }
 
@@ -380,7 +383,7 @@ def callback_diagnostic(ch, method, properties, body):
 
         # Acknowledge le message
         ch.basic_ack(delivery_tag=method.delivery_tag)
-        logger.info(f"[ACK] Message traité avec succès")
+        logger.info("[ACK] Message traité avec succès")
 
     except Exception as e:
         logger.error(f"[NACK] Erreur: {e}")
@@ -398,7 +401,7 @@ def callback_gradcam(ch, method, properties, body):
         process_diagnostic_task(task_data)
 
         ch.basic_ack(delivery_tag=method.delivery_tag)
-        logger.info(f"[ACK] Grad-CAM traité avec succès")
+        logger.info("[ACK] Grad-CAM traité avec succès")
 
     except Exception as e:
         logger.error(f"[NACK] Erreur Grad-CAM: {e}")

@@ -273,9 +273,10 @@ def get_result(task_id):
             return jsonify(result), 200
         else:
             return jsonify({'status': 'pending', 'message': 'Résultat pas encore disponible'}), 202
-    
+
     except Exception as e:
         return jsonify({'error': f"Erreur : {str(e)}"}), 500
+
 
 @app.route('/health', methods=['GET'])
 def health_check():
@@ -284,6 +285,7 @@ def health_check():
         'status': 'healthy',
         'models_loaded': len([m for m in models_cache if m != 'device']) > 0
     })
+
 
 if __name__ == '__main__':
     print("Démarrage du serveur Flask...")

@@ -16,14 +16,20 @@ pathology_options = {
 col1, col2 = st.columns([2, 1])
 
 with col1:
-    selected_pathology_label = st.selectbox("Choisissez la pathologie à détecter :", list(pathology_options.keys()))
+    selected_pathology_label = st.selectbox(
+        "Choisissez la pathologie à détecter :",
+        list(pathology_options.keys())
+    )
     model_type = pathology_options[selected_pathology_label]
 
 with col2:
     st.write("")  # Alignement
     show_gradcam = st.checkbox("🔍 Afficher Grad-CAM", value=False)
 
-uploaded_file = st.file_uploader("Choisissez une image de fond d'œil...", type=["jpg", "png", "jpeg"])
+uploaded_file = st.file_uploader(
+    "Choisissez une image de fond d'œil...",
+    type=["jpg", "png", "jpeg"]
+)
 
 if uploaded_file is not None:
     # Affichage original
@@ -125,7 +131,10 @@ if uploaded_file is not None:
                     if show_gradcam and 'grad_cam' in result.get("result", {}):
                         st.markdown("---")
                         st.markdown("### 🔥 Heatmap Grad-CAM")
-                        st.markdown("*Zones d'intérêt identifiées par le modèle (rouge = important)*")
+                        st.markdown(
+                            "*Zones d'intérêt identifiées par le modèle "
+                            "(rouge = important)*"
+                        )
 
                         # Décoder l'image base64
                         grad_cam_base64 = result['result']['grad_cam']
@@ -133,7 +142,11 @@ if uploaded_file is not None:
                             grad_cam_base64 = grad_cam_base64.split(',')[1]
                         image_data = base64.b64decode(grad_cam_base64)
                         heatmap_image = Image.open(io.BytesIO(image_data))
-                        st.image(heatmap_image, caption="Zones d'intérêt détectées", use_column_width=True)
+                        st.image(
+                            heatmap_image,
+                            caption="Zones d'intérêt détectées",
+                            use_column_width=True
+                        )
 
                         # Explication
                         st.caption("""
@@ -157,4 +170,3 @@ if uploaded_file is not None:
 
             except requests.exceptions.RequestException as e:
                 st.error(f"❌ Erreur de connexion au backend: {e}")
-
