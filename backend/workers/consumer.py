@@ -410,7 +410,7 @@ def callback_gradcam(ch, method, properties, body):
 
 def start_worker():
     """Démarre le worker en écoutant les queues."""
-    global rabbitmq_channel
+    global rabbitmq_channel  # noqa: F824
 
     logger.info("════════════════════════════════════════")
     logger.info("   RabbitMQ Worker - Ophtia")

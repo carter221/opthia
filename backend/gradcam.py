@@ -118,7 +118,8 @@ def encode_image_to_base64(image_np, quality=70):
     import base64
 
     # Encoder en JPEG avec compression (plus léger que PNG)
-    _, buffer = cv2.imencode('.jpg', cv2.cvtColor(image_np, cv2.COLOR_RGB2BGR),
+    img_bgr = cv2.cvtColor(image_np, cv2.COLOR_RGB2BGR)
+    _, buffer = cv2.imencode('.jpg', img_bgr,
                              [cv2.IMWRITE_JPEG_QUALITY, quality])
     img_base64 = base64.b64encode(buffer).decode('utf-8')
 
