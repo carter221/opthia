@@ -18,7 +18,6 @@ from pymongo import MongoClient
 import logging
 from datetime import datetime
 import albumentations as A
-from albumentations.pytorch import ToTensorV2
 import torchvision.transforms as transforms
 import signal
 import sys
@@ -39,48 +38,48 @@ class GradCAM:
         self.target_layer = target_layer
         self.gradients = None
         self.activations = None
-        
+
         # Register hooks
         target_layer.register_forward_hook(self._forward_hook)
         target_layer.register_backward_hook(self._backward_hook)
-    
+
     def _forward_hook(self, module, input, output):
         self.activations = output.detach()
-    
+
     def _backward_hook(self, module, grad_input, grad_output):
         self.gradients = grad_output[0].detach()
-    
+
     def generate_cam(self, x):
         # Forward pass
         self.model.zero_grad()
         output = self.model(x)
-        
+
         if isinstance(output, tuple):
             output = output[0]
-        
+
         # Backward pass
         score = output.max()
         self.model.zero_grad()
         score.backward()
-        
+
         # Compute CAM
         if self.gradients is None or self.activations is None:
             # Fallback: create a simple heatmap
             return np.ones((512, 512), dtype=np.float32) * 0.5
-        
+
         gradients = self.gradients[0].cpu().numpy()
         activations = self.activations[0].cpu().numpy()
-        
+
         weights = gradients.mean(axis=(1, 2))
         cam = np.zeros(activations.shape[1:], dtype=np.float32)
-        
+
         for i, w in enumerate(weights):
             cam += w * activations[i, :, :]
-        
+
         cam = np.maximum(cam, 0)
         cam = cv2.resize(cam, (512, 512))
         cam = (cam - cam.min()) / (cam.max() - cam.min() + 1e-8)
-        
+
         return cam
 
 
@@ -88,10 +87,10 @@ def apply_heatmap_to_image(image, cam, alpha=0.5, resize_to=None):
     """Applique la heatmap Grad-CAM sur une image."""
     if resize_to:
         image = cv2.resize(image, resize_to)
-    
+
     heatmap = cv2.applyColorMap((cam * 255).astype(np.uint8), cv2.COLORMAP_JET)
     heatmap = cv2.resize(heatmap, (image.shape[1], image.shape[0]))
-    
+
     result = cv2.addWeighted(image, 1 - alpha, heatmap, alpha, 0)
     return result
 
@@ -112,45 +111,41 @@ rabbitmq_channel = None
 
 def init_models():
     """Initialise les modèles PyTorch."""
-    global models_cache
-    
+    global models_cache  # noqa: F824
+
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     models_cache['device'] = device
     logger.info(f"Device: {device}")
-    
+
     # --- Chargement du modèle Rétinopathie Diabétique ---
     rd_model_path = 'models/best_dr_model.pth'
     if os.path.exists(rd_model_path):
         try:
-            rd_model = models.resnet50(weights=None)
-            num_features = rd_model.fc.in_features
-            rd_model.fc = nn.Sequential(
-                nn.Linear(num_features, 512),
-                nn.ReLU(),
-                nn.Dropout(0.5),
-                nn.Linear(512, 5)
-            )
-            
-            checkpoint = torch.load(rd_model_path, map_location=device)
-            state_dict = checkpoint.get('model_state_dict', checkpoint)
-            
-            from collections import OrderedDict
-            new_state_dict = OrderedDict()
-            for k, v in state_dict.items():
-                if k.startswith('backbone.'):
-                    new_state_dict[k[9:]] = v
-                else:
-                    new_state_dict[k] = v
-            
-            rd_model.load_state_dict(new_state_dict, strict=False)
+            # Créer le modèle avec la même architecture que lors de l'entraînement
+            class DRClassifier(nn.Module):
+                def __init__(self, num_classes=5, pretrained=False):
+                    super(DRClassifier, self).__init__()
+                    self.backbone = models.resnet50(weights='DEFAULT' if pretrained else None)
+                    num_features = self.backbone.fc.in_features
+                    self.backbone.fc = nn.Linear(num_features, num_classes)
+
+                def forward(self, x):
+                    return self.backbone(x)
+
+            rd_model = DRClassifier(num_classes=5, pretrained=False)
+
+            # Charger les poids
+            state_dict = torch.load(rd_model_path, map_location=device)
+            rd_model.load_state_dict(state_dict, strict=True)
+
             rd_model.to(device)
             rd_model.eval()
             models_cache['rd'] = rd_model
-            logger.info("✓ Modèle RD chargé")
+            logger.info("✓ Modèle RD chargé avec succès")
         except Exception as e:
             logger.error(f"✗ Erreur RD: {e}")
             raise
-    
+
     # --- Chargement du modèle Glaucome ---
     glaucoma_model_path = 'models/best_efficientnet_glaucoma.pth'
     if os.path.exists(glaucoma_model_path):
@@ -177,7 +172,7 @@ def init_models():
 def init_mongodb():
     """Initialise la connexion à MongoDB."""
     global db
-    
+
     mongo_uri = os.environ.get('MONGO_URI', 'mongodb://mongo:27017/ophtia')
     try:
         db_client = MongoClient(mongo_uri)
@@ -191,20 +186,21 @@ def init_mongodb():
 
 def init_rabbitmq():
     """Initialise la connexion à RabbitMQ."""
-    global rabbitmq_connection, rabbitmq_channel
-    
+    global rabbitmq_connection
+    global rabbitmq_channel
+
     rabbitmq_url = os.environ.get('RABBITMQ_URL', 'amqp://guest:guest@rabbitmq:5672/%2F')
     try:
         rabbitmq_connection = pika.BlockingConnection(pika.URLParameters(rabbitmq_url))
         rabbitmq_channel = rabbitmq_connection.channel()
-        
+
         # Déclarer les queues
         rabbitmq_channel.queue_declare(queue='diagnostic_tasks', durable=True)
         rabbitmq_channel.queue_declare(queue='gradcam_tasks', durable=True)
-        
+
         # Limiter à 1 message par worker à la fois
         rabbitmq_channel.basic_qos(prefetch_count=1)
-        
+
         logger.info("✓ Connexion à RabbitMQ réussie")
     except Exception as e:
         logger.error(f"✗ Erreur RabbitMQ: {e}")
@@ -248,48 +244,48 @@ def process_diagnostic_task(task_data):
     image_base64 = task_data.get('image_base64')
     model_type = task_data.get('model_type')
     filename = task_data.get('filename', 'unknown')
-    
+
     logger.info(f"[Worker] Traitement: task_id={task_id}, model={model_type}")
-    
+
     try:
         # Décodage image
         if image_base64.startswith('data:'):
             image_base64 = image_base64.split(',')[1]
-        
+
         image_bytes = base64.b64decode(image_base64)
         image = Image.open(io.BytesIO(image_bytes)).convert('RGB')
         image_np = np.array(image)
-        
+
         # Traitement différencié
         if model_type == 'rd':
             image_np = crop_image_from_gray(image_np, tol=10)
             image_np = cv2.resize(image_np, (512, 512))
-        
+
         # Transformations
         transforms_pipeline = get_prediction_transforms(model_type)
-        
+
         if model_type == 'rd':
             transformed = transforms_pipeline(image=image_np)
             processed_image = transformed['image']
         else:
             processed_image = transforms_pipeline(Image.fromarray(image_np))
-        
+
         # Batch
         if processed_image.dim() == 3:
             input_tensor = processed_image.unsqueeze(0).to(models_cache['device'])
         else:
             input_tensor = processed_image.to(models_cache['device'])
-        
+
         # Prédiction
         model = models_cache[model_type]
-        
+
         # Générer Grad-CAM
         try:
             if model_type == 'rd':
-                target_layer = model.layer4
+                target_layer = model.backbone.layer4
             else:
                 target_layer = model.features[-1]
-            
+
             gradcam = GradCAM(model, target_layer)
             cam = gradcam.generate_cam(input_tensor)
             heatmap_image = apply_heatmap_to_image(image_np, cam, alpha=0.5, resize_to=(256, 256))
@@ -297,21 +293,21 @@ def process_diagnostic_task(task_data):
         except Exception as e:
             logger.warning(f"Grad-CAM non généré: {e}")
             grad_cam_base64 = None
-        
+
         with torch.no_grad():
             output = model(input_tensor)
-            
+
             if model_type == 'rd':
                 probabilities = torch.softmax(output, dim=1)
                 prediction_multiclass = torch.argmax(probabilities, dim=1).item()
                 prediction_binary = 0 if prediction_multiclass == 0 else 1
-                
+
                 # Afficher la probabilité de la classe prédite (pas toujours classe 0)
                 if prediction_binary == 0:
                     confidence = float(probabilities[0, 0].item())
                 else:
                     confidence = float(probabilities[0, prediction_multiclass].item())
-                
+
                 result_data = {
                     'prediction_class': int(prediction_binary),
                     'prediction_multiclass': int(prediction_multiclass),
@@ -323,10 +319,12 @@ def process_diagnostic_task(task_data):
                         'class_3': float(probabilities[0, 3].item()),
                         'class_4': float(probabilities[0, 4].item()),
                     },
-                    'recommendation': "⚠️ RÉTINOPATHIE DÉTECTÉE" if prediction_binary == 1 else "✅ Aucune RD",
+                    'recommendation': ("⚠️ RÉTINOPATHIE DÉTECTÉE" if
+                                       prediction_binary == 1
+                                       else "✅ Aucune RD"),
                     'grad_cam': grad_cam_base64,
                 }
-                
+
                 result = {
                     'task_id': task_id,
                     'result': result_data,
@@ -338,14 +336,15 @@ def process_diagnostic_task(task_data):
             else:
                 probability = torch.sigmoid(output).item()
                 prediction = 1 if probability > 0.5 else 0
-                
+
                 result_data = {
                     'prediction_class': int(prediction),
                     'probability': probability,
-                    'recommendation': "⚠️ GLAUCOME DÉTECTÉ" if prediction == 1 else "✅ Aucun glaucome",
+                    'recommendation': ("⚠️ GLAUCOME DÉTECTÉ" if prediction == 1
+                                       else "✅ Aucun glaucome"),
                     'grad_cam': grad_cam_base64,
                 }
-                
+
                 result = {
                     'task_id': task_id,
                     'result': result_data,
@@ -354,14 +353,14 @@ def process_diagnostic_task(task_data):
                     'filename': filename,
                     'timestamp': datetime.utcnow()
                 }
-        
+
         # Sauvegarde MongoDB
         if db is not None:
             db.diagnostic_results.insert_one(result)
             logger.info(f"✓ Diagnostic sauvegardé: {task_id}")
-        
+
         return result
-        
+
     except Exception as e:
         logger.error(f"✗ Erreur diagnostic: {e}")
         if db is not None:
@@ -379,13 +378,13 @@ def callback_diagnostic(ch, method, properties, body):
     try:
         task_data = json.loads(body)
         logger.info(f"[Queue: diagnostic_tasks] Message reçu: {task_data.get('task_id')}")
-        
+
         process_diagnostic_task(task_data)
-        
+
         # Acknowledge le message
         ch.basic_ack(delivery_tag=method.delivery_tag)
-        logger.info(f"[ACK] Message traité avec succès")
-        
+        logger.info("[ACK] Message traité avec succès")
+
     except Exception as e:
         logger.error(f"[NACK] Erreur: {e}")
         # NACK et requeue pour retry
@@ -397,13 +396,13 @@ def callback_gradcam(ch, method, properties, body):
     try:
         task_data = json.loads(body)
         logger.info(f"[Queue: gradcam_tasks] Message reçu: {task_data.get('task_id')}")
-        
+
         # Pour l'instant, même traitement que diagnostic
         process_diagnostic_task(task_data)
-        
+
         ch.basic_ack(delivery_tag=method.delivery_tag)
-        logger.info(f"[ACK] Grad-CAM traité avec succès")
-        
+        logger.info("[ACK] Grad-CAM traité avec succès")
+
     except Exception as e:
         logger.error(f"[NACK] Erreur Grad-CAM: {e}")
         ch.basic_nack(delivery_tag=method.delivery_tag, requeue=True)
@@ -411,42 +410,42 @@ def callback_gradcam(ch, method, properties, body):
 
 def start_worker():
     """Démarre le worker en écoutant les queues."""
-    global rabbitmq_channel
-    
+    global rabbitmq_channel  # noqa: F824
+
     logger.info("════════════════════════════════════════")
     logger.info("   RabbitMQ Worker - Ophtia")
     logger.info("════════════════════════════════════════")
-    
+
     init_models()
     init_mongodb()
     init_rabbitmq()
-    
+
     # Enregistrer les consumers
     rabbitmq_channel.basic_consume(
         queue='diagnostic_tasks',
         on_message_callback=callback_diagnostic
     )
-    
+
     rabbitmq_channel.basic_consume(
         queue='gradcam_tasks',
         on_message_callback=callback_gradcam
     )
-    
+
     logger.info("Worker en écoute sur les queues...")
     logger.info("  - diagnostic_tasks")
     logger.info("  - gradcam_tasks")
     logger.info("════════════════════════════════════════")
-    
+
     # Graceful shutdown
     def signal_handler(sig, frame):
         logger.info("\n[SHUTDOWN] Arrêt du worker...")
         rabbitmq_channel.stop_consuming()
         rabbitmq_connection.close()
         sys.exit(0)
-    
+
     signal.signal(signal.SIGINT, signal_handler)
     signal.signal(signal.SIGTERM, signal_handler)
-    
+
     try:
         rabbitmq_channel.start_consuming()
     except KeyboardInterrupt:

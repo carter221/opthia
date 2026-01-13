@@ -1,7 +1,5 @@
 import os
 from flask import Flask, request, jsonify
-from PIL import Image
-import io
 import torch
 import torchvision.transforms as transforms
 import albumentations as A
@@ -10,14 +8,13 @@ import numpy as np
 import torch.nn as nn
 import torchvision.models as models
 from pymongo import MongoClient
-from datetime import datetime
 import cv2
 import json
 import pika
 import uuid
-from gradcam import GradCAM, apply_heatmap_to_image, encode_image_to_base64
 
 app = Flask(__name__)
+
 
 def crop_image_from_gray(img, tol=10):
     """
@@ -29,7 +26,7 @@ def crop_image_from_gray(img, tol=10):
     elif img.ndim == 3:
         gray_img = cv2.cvtColor(img, cv2.COLOR_RGB2GRAY)
         mask = gray_img > tol
-        
+
         check_shape = img[:, :, 0][np.ix_(mask.any(1), mask.any(0))].shape[0]
         if (check_shape == 0):
             return img
@@ -40,6 +37,7 @@ def crop_image_from_gray(img, tol=10):
             img = np.stack([img1, img2, img3], axis=-1)
         return img
 
+
 # --- CONFIGURATION ET CONNEXIONS ---
 
 # Design Pattern Singleton pour les modèles et la connexion DB
@@ -47,6 +45,7 @@ models_cache = {}
 db_client = None
 db = None
 rabbitmq_channel = None
+
 
 def init_rabbitmq():
     """Initialise la connexion à RabbitMQ."""
@@ -62,6 +61,7 @@ def init_rabbitmq():
         print(f"AVERTISSEMENT: RabbitMQ indisponible. {e}")
         rabbitmq_channel = None
 
+
 def publish_task(queue_name, task_data):
     """Publie une tâche dans RabbitMQ."""
     try:
@@ -69,7 +69,7 @@ def publish_task(queue_name, task_data):
         connection = pika.BlockingConnection(pika.URLParameters(rabbitmq_url))
         channel = connection.channel()
         channel.queue_declare(queue=queue_name, durable=True)
-        
+
         channel.basic_publish(
             exchange='',
             routing_key=queue_name,
@@ -83,10 +83,11 @@ def publish_task(queue_name, task_data):
         print(f"[✗] Erreur publication RabbitMQ: {e}")
         return False
 
+
 def init_connections():
     """Initialise la connexion à la base de données et charge les modèles."""
     global db_client, db
-    
+
     # Connexion à MongoDB
     mongo_uri = os.environ.get('MONGO_URI', 'mongodb://localhost:27017/ophtia')
     try:
@@ -101,6 +102,7 @@ def init_connections():
 
     # Chargement des modèles
     load_models()
+
 
 def get_prediction_transforms(model_type):
     """Retourne le pipeline de transformation EXACT utilisé à l'entraînement pour chaque modèle."""
@@ -121,11 +123,12 @@ def get_prediction_transforms(model_type):
     else:
         raise ValueError("Type de modèle non supporté")
 
+
 def load_models():
     """Charge les modèles PyTorch au démarrage."""
     device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
     models_cache['device'] = device
-    
+
     # --- Chargement du modèle Glaucome ---
     glaucoma_model_path = 'models/best_efficientnet_glaucoma.pth'
     if os.path.exists(glaucoma_model_path):
@@ -163,7 +166,7 @@ def load_models():
                 nn.Dropout(0.5),
                 nn.Linear(512, 5)  # 5 classes pour RD
             )
-            
+
             checkpoint = torch.load(rd_model_path, map_location=device)
             state_dict = checkpoint.get('model_state_dict', checkpoint)
 
@@ -176,7 +179,7 @@ def load_models():
                     new_state_dict[name] = v
                 else:
                     new_state_dict[k] = v
-            
+
             rd_model.load_state_dict(new_state_dict, strict=False)
             rd_model.to(device)
             rd_model.eval()
@@ -187,47 +190,69 @@ def load_models():
     else:
         print(f"AVERTISSEMENT: Le fichier du modèle {rd_model_path} n'a pas été trouvé.")
 
+
 # --- ENDPOINTS DE L'API ---
+
 
 @app.route('/', methods=['GET'])
 def index():
     return "Backend de diagnostic ophtalmologique est en cours d'exécution!"
 
+
 @app.route('/predict_with_gradcam', methods=['POST'])
 def predict_with_gradcam():
     """
     Endpoint qui envoie la tâche de diagnostic au worker RabbitMQ.
+    Accepte JSON ou multipart/form-data.
     Retourne une task_id pour polling des résultats.
     """
-    if 'file' not in request.files:
-        return jsonify({'error': 'Aucun fichier fourni'}), 400
-
-    file = request.files['file']
-    model_type = request.form.get('model_type', 'rd')
-
-    if model_type not in ['rd', 'glaucoma']:
-        return jsonify({'error': 'model_type doit être "rd" ou "glaucoma"'}), 400
+    task_id = str(uuid.uuid4())
 
     try:
-        # Génération ID unique
-        task_id = str(uuid.uuid4())
-        
-        # Encodage image en base64
-        image_bytes = file.read()
-        image_base64 = "data:image/png;base64," + __import__('base64').b64encode(image_bytes).decode('utf-8')
-        
+        # Supporter à la fois JSON et multipart/form-data
+        if request.is_json:
+            # Format JSON (depuis Streamlit corrigé)
+            data = request.get_json()
+            image_base64 = data.get('image_base64')
+            model_type = data.get('model_type', 'rd')
+            filename = 'image.png'
+
+            if not image_base64:
+                return jsonify({'error': 'image_base64 manquant'}), 400
+
+            # Vérifier si le base64 a le préfixe data:
+            if not image_base64.startswith('data:'):
+                image_base64 = f"data:image/png;base64,{image_base64}"
+        else:
+            # Format multipart/form-data (ancien format)
+            if 'file' not in request.files:
+                return jsonify({'error': 'Aucun fichier fourni'}), 400
+
+            file = request.files['file']
+            model_type = request.form.get('model_type', 'rd')
+            filename = file.filename
+
+            # Encodage image en base64
+            image_bytes = file.read()
+            b64_module = __import__('base64')
+            encoded = b64_module.b64encode(image_bytes)
+            image_base64 = "data:image/png;base64," + encoded.decode('utf-8')
+
+        if model_type not in ['rd', 'glaucoma']:
+            return jsonify({'error': 'model_type doit être "rd" ou "glaucoma"'}), 400
+
         # Préparer la tâche
         task_data = {
             'task_id': task_id,
             'image_base64': image_base64,
             'model_type': model_type,
-            'filename': file.filename
+            'filename': filename
         }
-        
+
         # Envoyer à RabbitMQ
         queue = 'diagnostic_tasks'
         published = publish_task(queue, task_data)
-        
+
         if published:
             return jsonify({
                 'status': 'submitted',
@@ -237,12 +262,11 @@ def predict_with_gradcam():
             }), 202
         else:
             return jsonify({'error': 'Impossible de soumettre la tâche'}), 500
-            
+
     except Exception as e:
         print(f"[✗] Erreur endpoint /predict_with_gradcam: {e}")
         return jsonify({'error': f"Erreur : {str(e)}"}), 500
 
-        return jsonify({'error': f"Erreur lors de la prédiction Grad-CAM : {str(e)}"}), 500
 
 @app.route('/result/<task_id>', methods=['GET'])
 def get_result(task_id):
@@ -250,17 +274,18 @@ def get_result(task_id):
     try:
         if db is None:
             return jsonify({'error': 'Connexion MongoDB non disponible'}), 503
-        
+
         result = db.diagnostic_results.find_one({'task_id': task_id})
-        
+
         if result:
             result.pop('_id', None)  # Supprimer l'ID MongoDB
             return jsonify(result), 200
         else:
             return jsonify({'status': 'pending', 'message': 'Résultat pas encore disponible'}), 202
-    
+
     except Exception as e:
         return jsonify({'error': f"Erreur : {str(e)}"}), 500
+
 
 @app.route('/health', methods=['GET'])
 def health_check():
@@ -269,6 +294,7 @@ def health_check():
         'status': 'healthy',
         'models_loaded': len([m for m in models_cache if m != 'device']) > 0
     })
+
 
 if __name__ == '__main__':
     print("Démarrage du serveur Flask...")
