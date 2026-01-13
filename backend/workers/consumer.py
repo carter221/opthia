@@ -18,6 +18,7 @@ from pymongo import MongoClient
 import logging
 from datetime import datetime
 import albumentations as A
+from albumentations.pytorch import ToTensorV2  # noqa: F401
 import torchvision.transforms as transforms
 import signal
 import sys
