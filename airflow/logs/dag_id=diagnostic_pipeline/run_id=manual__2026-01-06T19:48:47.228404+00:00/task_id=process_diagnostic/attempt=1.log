@@ -1,0 +1,22 @@
+[2026-01-06T19:49:23.699+0000] {taskinstance.py:1159} INFO - Dependencies all met for dep_context=non-requeueable deps ti=<TaskInstance: diagnostic_pipeline.process_diagnostic manual__2026-01-06T19:48:47.228404+00:00 [queued]>
+[2026-01-06T19:49:23.709+0000] {taskinstance.py:1159} INFO - Dependencies all met for dep_context=requeueable deps ti=<TaskInstance: diagnostic_pipeline.process_diagnostic manual__2026-01-06T19:48:47.228404+00:00 [queued]>
+[2026-01-06T19:49:23.710+0000] {taskinstance.py:1361} INFO - Starting attempt 1 of 3
+[2026-01-06T19:49:23.725+0000] {taskinstance.py:1382} INFO - Executing <Task(PythonOperator): process_diagnostic> on 2026-01-06 19:48:47.228404+00:00
+[2026-01-06T19:49:23.737+0000] {standard_task_runner.py:57} INFO - Started process 13521 to run task
+[2026-01-06T19:49:23.742+0000] {standard_task_runner.py:84} INFO - Running: ['***', 'tasks', 'run', 'diagnostic_pipeline', 'process_diagnostic', 'manual__2026-01-06T19:48:47.228404+00:00', '--job-id', '4', '--raw', '--subdir', 'DAGS_FOLDER/diagnostic_pipeline.py', '--cfg-path', '/tmp/tmphgrysaef']
+[2026-01-06T19:49:23.745+0000] {standard_task_runner.py:85} INFO - Job 4: Subtask process_diagnostic
+[2026-01-06T19:49:23.829+0000] {task_command.py:416} INFO - Running <TaskInstance: diagnostic_pipeline.process_diagnostic manual__2026-01-06T19:48:47.228404+00:00 [running]> on host b36b1a0783f6
+[2026-01-06T19:49:23.974+0000] {taskinstance.py:1662} INFO - Exporting env vars: AIRFLOW_CTX_DAG_OWNER='ophtia' AIRFLOW_CTX_DAG_ID='diagnostic_pipeline' AIRFLOW_CTX_TASK_ID='process_diagnostic' AIRFLOW_CTX_EXECUTION_DATE='2026-01-06T19:48:47.228404+00:00' AIRFLOW_CTX_TRY_NUMBER='1' AIRFLOW_CTX_DAG_RUN_ID='manual__2026-01-06T19:48:47.228404+00:00'
+[2026-01-06T19:49:24.000+0000] {taskinstance.py:1937} ERROR - Task failed with exception
+Traceback (most recent call last):
+  File "/home/airflow/.local/lib/python3.10/site-packages/airflow/operators/python.py", line 192, in execute
+    return_value = self.execute_callable()
+  File "/home/airflow/.local/lib/python3.10/site-packages/airflow/operators/python.py", line 209, in execute_callable
+    return self.python_callable(*self.op_args, **self.op_kwargs)
+  File "/opt/airflow/dags/diagnostic_pipeline.py", line 158, in process_diagnostic
+    task_id = task_data['task_id']
+KeyError: 'task_id'
+[2026-01-06T19:49:24.021+0000] {taskinstance.py:1400} INFO - Marking task as UP_FOR_RETRY. dag_id=diagnostic_pipeline, task_id=process_diagnostic, execution_date=20260106T194847, start_date=20260106T194923, end_date=20260106T194924
+[2026-01-06T19:49:24.041+0000] {standard_task_runner.py:104} ERROR - Failed to execute job 4 for task process_diagnostic ('task_id'; 13521)
+[2026-01-06T19:49:24.090+0000] {local_task_job_runner.py:228} INFO - Task exited with return code 1
+[2026-01-06T19:49:24.130+0000] {taskinstance.py:2778} INFO - 0 downstream tasks scheduled from follow-on schedule check
