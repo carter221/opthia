@@ -36,10 +36,10 @@ services:
       - backend
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.frontend-candidator.rule=Host(`ophtia.sjudicael.top`)"
-      - "traefik.http.routers.frontend-candidator.entrypoints=https"
-      - "traefik.http.routers.frontend-candidator.tls.certresolver=letsencrypt"
-      - "traefik.http.services.frontend-candidator.loadbalancer.server.port=8501"
+      - "traefik.http.routers.frontend-opthia.rule=Host(`ophtia.sjudicael.top`)"
+      - "traefik.http.routers.frontend-opthia.entrypoints=https"
+      - "traefik.http.routers.frontend-opthia.tls.certresolver=letsencrypt"
+      - "traefik.http.services.frontend-opthia.loadbalancer.server.port=8501"
 
   mongo:
     image: mongo:latest
