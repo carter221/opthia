@@ -1,0 +1,6 @@
+{
+  "dependencies": {
+    "bcryptjs": "^3.0.3",
+    "jwt-simple": "^0.5.6"
+  }
+}

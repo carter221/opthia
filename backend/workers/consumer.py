@@ -242,14 +242,18 @@ def get_prediction_transforms(model_type):
 def process_diagnostic_task(task_data):
     """Traite une tâche de diagnostic."""
     task_id = task_data.get('task_id')
-    image_base64 = task_data.get('image_base64')
+    batch_id = task_data.get('batch_id')
+    image_base64_raw = task_data.get('image_base64')
     model_type = task_data.get('model_type')
     filename = task_data.get('filename', 'unknown')
+    patient_name = task_data.get('patient_name', 'Patient Anonyme')
+    user_email = task_data.get('user_email')
 
-    logger.info(f"[Worker] Traitement: task_id={task_id}, model={model_type}")
+    logger.info(f"[Worker] Traitement: task_id={task_id}, batch_id={batch_id}, model={model_type}")
 
     try:
         # Décodage image
+        image_base64 = image_base64_raw
         if image_base64.startswith('data:'):
             image_base64 = image_base64.split(',')[1]
 
@@ -303,7 +307,7 @@ def process_diagnostic_task(task_data):
                 prediction_multiclass = torch.argmax(probabilities, dim=1).item()
                 prediction_binary = 0 if prediction_multiclass == 0 else 1
 
-                # Afficher la probabilité de la classe prédite (pas toujours classe 0)
+                # Afficher la probabilité de la classe prédite
                 if prediction_binary == 0:
                     confidence = float(probabilities[0, 0].item())
                 else:
@@ -320,18 +324,22 @@ def process_diagnostic_task(task_data):
                         'class_3': float(probabilities[0, 3].item()),
                         'class_4': float(probabilities[0, 4].item()),
                     },
-                    'recommendation': ("⚠️ RÉTINOPATHIE DÉTECTÉE" if
+                    'recommendation': ("⚠️ RÉTINOPATHIE DÉTECTÉE - À surveiller de près" if
                                        prediction_binary == 1
-                                       else "✅ Aucune RD"),
+                                       else "✅ Saine - Absence de Rétinopathie Diabétique"),
                     'grad_cam': grad_cam_base64,
                 }
 
                 result = {
                     'task_id': task_id,
+                    'batch_id': batch_id,
                     'result': result_data,
                     'model_type': model_type,
                     'status': 'completed',
                     'filename': filename,
+                    'patient_name': patient_name,
+                    'image_base64': image_base64_raw,  # Sauvegarder pour le réapprentissage interne
+                    'user_email': user_email,
                     'timestamp': datetime.utcnow()
                 }
             else:
@@ -341,17 +349,21 @@ def process_diagnostic_task(task_data):
                 result_data = {
                     'prediction_class': int(prediction),
                     'probability': probability,
-                    'recommendation': ("⚠️ GLAUCOME DÉTECTÉ" if prediction == 1
-                                       else "✅ Aucun glaucome"),
+                    'recommendation': ("⚠️ GLAUCOME DÉTECTÉ - Suspicion de glaucome" if prediction == 1
+                                       else "✅ Sain - Absence de signes de glaucome"),
                     'grad_cam': grad_cam_base64,
                 }
 
                 result = {
                     'task_id': task_id,
+                    'batch_id': batch_id,
                     'result': result_data,
                     'model_type': model_type,
                     'status': 'completed',
                     'filename': filename,
+                    'patient_name': patient_name,
+                    'image_base64': image_base64_raw,  # Sauvegarder pour le réapprentissage interne
+                    'user_email': user_email,
                     'timestamp': datetime.utcnow()
                 }
 
@@ -367,8 +379,12 @@ def process_diagnostic_task(task_data):
         if db is not None:
             db.diagnostic_results.insert_one({
                 'task_id': task_id,
+                'batch_id': batch_id,
                 'status': 'failed',
                 'error': str(e),
+                'patient_name': patient_name,
+                'filename': filename,
+                'user_email': user_email,
                 'timestamp': datetime.utcnow()
             })
         raise
