@@ -13,6 +13,11 @@ import google.generativeai as genai
 import bcrypt
 import jwt
 from functools import wraps
+import pydicom
+from pydicom.dataset import Dataset, FileDataset
+from pydicom.uid import ExplicitVRLittleEndian, generate_uid
+import requests
+from PIL import Image
 
 app = Flask(__name__)
 # Autoriser les requêtes cross-origin depuis notre futur front-end React
@@ -219,8 +224,105 @@ def submit_batch(current_user):
             filename = patient.get('filename', 'image.png')
             patient_name = patient.get('patient_name', 'Patient')
 
-            if not image_base64.startswith('data:'):
-                image_base64 = f"data:image/png;base64,{image_base64}"
+            # Nettoyer base64 pour la conversion DICOM
+            pure_base64 = image_base64
+            if pure_base64.startswith('data:'):
+                pure_base64 = pure_base64.split(',')[1]
+
+            # Conversion et envoi DICOM asynchrone / automatique sur Orthanc
+            orthanc_id = None
+            extracted_patient_name = patient_name
+            extracted_patient_id = str(uuid.uuid4())[:8]
+            extracted_birth_date = '19800101'
+
+            try:
+                img_data = base64.b64decode(pure_base64)
+                
+                # Vérifier si l'image importée est un DICOM natif (en-tête DICOM commence par DICM à l'octet 128)
+                is_native_dicom = False
+                if len(img_data) > 132 and img_data[128:132] == b"DICM":
+                    is_native_dicom = True
+
+                if is_native_dicom:
+                    # Lire le DICOM existant
+                    ds_existing = pydicom.dread_file(io.BytesIO(img_data))
+                    
+                    # Extraire les métadonnées existantes
+                    if getattr(ds_existing, 'PatientName', None):
+                        extracted_patient_name = str(ds_existing.PatientName).replace('^', ' ')
+                    if getattr(ds_existing, 'PatientID', None):
+                        extracted_patient_id = str(ds_existing.PatientID)
+                    if getattr(ds_existing, 'PatientBirthDate', None):
+                        extracted_birth_date = str(ds_existing.PatientBirthDate)
+
+                    # Pour l'IA (modèle de vision), extraire le pixel_array
+                    if hasattr(ds_existing, 'pixel_array'):
+                        pixel_arr = ds_existing.pixel_array
+                        # Convertir le pixel array en image PIL RGB puis en base64 pour le worker
+                        # Normaliser si nécessaire
+                        if pixel_arr.max() > 0:
+                            pixel_arr = ((pixel_arr - pixel_arr.min()) / (pixel_arr.max() - pixel_arr.min()) * 255).astype(np.uint8)
+                        pil_img = Image.fromarray(pixel_arr).convert('RGB')
+                        buffered = io.BytesIO()
+                        pil_img.save(buffered, format="PNG")
+                        image_base64 = f"data:image/png;base64,{base64.b64encode(buffered.getvalue()).decode('utf-8')}"
+
+                    # Envoyer directement le DICOM brut reçu à Orthanc
+                    orthanc_url = os.environ.get('ORTHANC_URL', 'http://orthanc:8042/instances')
+                    auth_env = os.environ.get('ORTHANC_AUTH')
+                    auth_tuple = tuple(auth_env.split(':')) if auth_env else None
+                    res = requests.post(orthanc_url, data=img_data, auth=auth_tuple)
+                    if res.status_code in [200, 201]:
+                        orthanc_id = res.json().get('ID')
+                else:
+                    # Ce n'est pas un DICOM natif, on procède à sa création comme avant
+                    img = Image.open(io.BytesIO(img_data)).convert('L')
+                    img_np = img.tobytes()
+
+                    filename_dcm = f"dicom_{uuid.uuid4()}.dcm"
+                    file_meta = Dataset()
+                    file_meta.TransferSyntaxUID = ExplicitVRLittleEndian
+                    file_meta.MediaStorageSOPClassUID = '1.2.840.10008.5.1.4.1.1.7'
+                    file_meta.MediaStorageSOPInstanceUID = generate_uid()
+                    file_meta.ImplementationClassUID = generate_uid()
+
+                    ds = FileDataset(filename_dcm, {}, file_meta=file_meta, preamble=b"\0" * 128)
+                    ds.PatientName = patient_name.replace(' ', '^')
+                    ds.PatientID = extracted_patient_id
+                    ds.PatientBirthDate = extracted_birth_date
+                    ds.PatientSex = 'O'
+                    ds.StudyInstanceUID = generate_uid()
+                    ds.SeriesInstanceUID = generate_uid()
+                    ds.SOPInstanceUID = file_meta.MediaStorageSOPInstanceUID
+                    ds.SOPClassUID = file_meta.MediaStorageSOPClassUID
+                    ds.Modality = 'OT'
+                    ds.SamplesPerPixel = 1
+                    ds.PhotometricInterpretation = "MONOCHROME2"
+                    ds.PixelRepresentation = 0
+                    ds.HighBit = 7
+                    ds.BitsStored = 8
+                    ds.BitsAllocated = 8
+                    ds.Rows = img.height
+                    ds.Columns = img.width
+                    ds.PixelData = img_np
+
+                    # Sauvegarder en mémoire sous forme de bytes avec les paramètres de formatage explicites
+                    ds.is_little_endian = True
+                    ds.is_implicit_VR = False
+
+                    dicom_io = io.BytesIO()
+                    pydicom.write_file(dicom_io, ds, write_like_original=False)
+                    dicom_bytes = dicom_io.getvalue()
+
+                    orthanc_url = os.environ.get('ORTHANC_URL', 'http://orthanc:8042/instances')
+                    auth_env = os.environ.get('ORTHANC_AUTH')
+                    auth_tuple = tuple(auth_env.split(':')) if auth_env else None
+                    res = requests.post(orthanc_url, data=dicom_bytes, auth=auth_tuple)
+                    if res.status_code in [200, 201]:
+                        orthanc_id = res.json().get('ID')
+
+            except Exception as e:
+                print(f"[DICOM Processing/Conversion error]: {e}")
 
             task_data = {
                 'task_id': task_id,
@@ -228,8 +330,9 @@ def submit_batch(current_user):
                 'image_base64': image_base64,
                 'model_type': model_type,
                 'filename': filename,
-                'patient_name': patient_name,
+                'patient_name': extracted_patient_name,
                 'user_email': current_user['email'],
+                'orthanc_id': orthanc_id,
                 'timestamp': datetime.utcnow().isoformat()
             }
 
@@ -356,6 +459,136 @@ def delete_diagnostic(current_user, task_id):
             return jsonify({'error': 'Diagnostic introuvable'}), 404
     except Exception as e:
         return jsonify({'error': str(e)}), 500
+
+
+# --- INTÉGRATION DICOM & PACS (ORTHANC) ---
+
+@app.route('/api/dicom/upload', methods=['POST'])
+@token_required
+def upload_dicom_image(current_user):
+    """
+    Reçoit une image du PhoneCapture et crée un fichier DICOM stocké sur Orthanc PACS.
+    JSON attendu : { patient_name, patient_id, image_base64, birth_date }
+    """
+    try:
+        data = request.get_json()
+        patient_name = data.get('patient_name', 'Patient Anonyme')
+        patient_id = data.get('patient_id', str(uuid.uuid4())[:8])
+        image_base64 = data.get('image_base64')
+        birth_date = data.get('birth_date')  # Format attendu : JJMMAAAA
+        formatted_dicom_birth_date = '19800101'
+        
+        # Validation de la date de naissance au format JJMMAAAA
+        if birth_date:
+            # Vérifier la longueur
+            if len(birth_date) != 8 or not birth_date.isdigit():
+                return jsonify({'error': 'La date de naissance doit être au format JJMMAAAA (8 chiffres)'}), 400
+            
+            # Valider l'existence de la date et sa cohérence par rapport au jour actuel
+            try:
+                parsed_birth_date = datetime.strptime(birth_date, '%d%m%Y')
+                if parsed_birth_date > datetime.now():
+                    return jsonify({'error': 'La date de naissance ne peut pas être dans le futur'}), 400
+                # Reconvertir au format DICOM standard (AAAAMMJJ)
+                formatted_dicom_birth_date = parsed_birth_date.strftime('%Y%m%d')
+            except ValueError:
+                return jsonify({'error': 'Date de naissance invalide (vérifiez les jours et mois)'}), 400
+
+        if not image_base64:
+            return jsonify({'error': 'Image base64 manquante'}), 400
+
+        # Décoder l'image base64
+        if image_base64.startswith('data:'):
+            image_base64 = image_base64.split(',')[1]
+        image_bytes = base64.b64decode(image_base64)
+        
+        # Charger avec PIL et convertir en niveaux de gris/RGB 8-bit pour DICOM
+        img = Image.open(io.BytesIO(image_bytes)).convert('L') # niveaux de gris standard
+        img_np = img.tobytes()
+
+        # Configurer le dataset DICOM
+        filename = f"dicom_{uuid.uuid4()}.dcm"
+        file_meta = Dataset()
+        file_meta.TransferSyntaxUID = ExplicitVRLittleEndian
+        file_meta.MediaStorageSOPClassUID = '1.2.840.10008.5.1.4.1.1.7' # Secondary Capture Image Storage
+        file_meta.MediaStorageSOPInstanceUID = generate_uid()
+        file_meta.ImplementationClassUID = generate_uid()
+
+        ds = FileDataset(filename, {}, file_meta=file_meta, preamble=b"\0" * 128)
+        
+        # Tags patients requis DICOM
+        ds.PatientName = patient_name.replace(' ', '^')
+        ds.PatientID = patient_id
+        ds.PatientBirthDate = formatted_dicom_birth_date
+        ds.PatientSex = 'O' # Other / Unknown
+        ds.StudyInstanceUID = generate_uid()
+        ds.SeriesInstanceUID = generate_uid()
+        ds.SOPInstanceUID = file_meta.MediaStorageSOPInstanceUID
+        ds.SOPClassUID = file_meta.MediaStorageSOPClassUID
+        
+        # Tags de l'image
+        ds.Modality = 'OT' # Other
+        ds.SamplesPerPixel = 1
+        ds.PhotometricInterpretation = "MONOCHROME2"
+        ds.PixelRepresentation = 0
+        ds.HighBit = 7
+        ds.BitsStored = 8
+        ds.BitsAllocated = 8
+        ds.Rows = img.height
+        ds.Columns = img.width
+        ds.PixelData = img_np
+
+        # Sauvegarder en mémoire sous forme de bytes avec les paramètres de formatage explicites
+        ds.is_little_endian = True
+        ds.is_implicit_VR = False
+        
+        dicom_io = io.BytesIO()
+        pydicom.write_file(dicom_io, ds, write_like_original=False)
+        dicom_bytes = dicom_io.getvalue()
+
+        # Envoyer le fichier DICOM brut à Orthanc par REST
+        orthanc_url = os.environ.get('ORTHANC_URL', 'http://orthanc:8042/instances')
+        auth_env = os.environ.get('ORTHANC_AUTH')
+        auth_tuple = tuple(auth_env.split(':')) if auth_env else None
+        res = requests.post(orthanc_url, data=dicom_bytes, auth=auth_tuple)
+        
+        if res.status_code in [200, 201]:
+            orthanc_data = res.json()
+            orthanc_id = orthanc_data.get('ID')
+
+            # Publier la tâche de diagnostic à RabbitMQ pour traitement IA et stockage MongoDB
+            task_id = str(uuid.uuid4())
+            
+            # Recomposer une URI base64 valide pour le visualiseur du frontend
+            full_base64 = image_base64
+            if not full_base64.startswith('data:'):
+                full_base64 = f"data:image/png;base64,{full_base64}"
+
+            task_data = {
+                'task_id': task_id,
+                'image_base64': full_base64,
+                'model_type': 'rd',  # valeur par défaut pour phonecapture, peut être ajustée
+                'filename': filename,
+                'patient_name': patient_name,
+                'user_email': current_user['email'],
+                'orthanc_id': orthanc_id,
+                'timestamp': datetime.utcnow().isoformat()
+            }
+
+            from app import publish_task
+            publish_task('diagnostic_tasks', task_data)
+
+            return jsonify({
+                'status': 'success',
+                'message': 'DICOM stocké avec succès dans le PACS Orthanc et soumis à l\'analyse',
+                'orthanc_id': orthanc_id,
+                'task_id': task_id
+            }), 201
+        else:
+            return jsonify({'error': f"Erreur Orthanc: {res.text}"}), res.status_code
+
+    except Exception as e:
+        return jsonify({'error': f"Erreur de conversion DICOM : {str(e)}"}), 500
 
 
 # --- SYSTEME DE DISCUSSION & RAG MEDICAL ---

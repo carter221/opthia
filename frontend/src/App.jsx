@@ -19,7 +19,8 @@ import {
   User,
   LogOut,
   KeyRound,
-  ShieldCheck
+  ShieldCheck,
+  Camera
 } from 'lucide-react';
 
 export default function App() {
@@ -50,6 +51,12 @@ export default function App() {
   const [profileForm, setProfileForm] = useState({ name: '', password: '' });
   const [profileMessage, setProfileMessage] = useState('');
   
+  // PhoneCapture States
+  const [cameraStream, setCameraStream] = useState(null);
+  const [capturedPhoto, setCapturedPhoto] = useState(null);
+  const [dicomPatient, setDicomPatient] = useState({ name: '', id: '', birthDate: '' });
+  const [isSendingDicom, setIsSendingDicom] = useState(false);
+
   // Toggle States for Modal Image preview
   const [showGradCam, setShowGradCam] = useState(true);
   const [isFullScreenImage, setIsFullScreenImage] = useState(false);
@@ -524,6 +531,16 @@ export default function App() {
               <UploadCloud className="w-5 h-5" />
               <span>Import en Lot (Batch)</span>
             </button>
+            <button 
+              onClick={() => {
+                setActiveTab('phonecapture');
+                setCapturedPhoto(null);
+              }}
+              className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-semibold transition-all button-press ${activeTab === 'phonecapture' ? 'bg-teal-600 text-white shadow-lg shadow-teal-600/20' : 'text-slate-400 hover:text-white hover:bg-slate-800/50'}`}
+            >
+              <Camera className="w-5 h-5" />
+              <span>Capture d'images</span>
+            </button>
             
             {user?.role === 'admin' && (
               <button 
@@ -844,6 +861,211 @@ export default function App() {
                   </button>
                 </div>
               )}
+            </div>
+          )}
+
+          {/* TAB: PHONECAPTURE CAMERA MODULE */}
+          {activeTab === 'phonecapture' && (
+            <div className="max-w-2xl mx-auto space-y-8">
+              <div className="glass p-8 rounded-3xl glow-teal space-y-6">
+                <div className="flex justify-between items-center border-b border-slate-800 pb-4">
+                  <div>
+                    <h3 className="text-xl font-bold text-white">Capture d'images DICOM</h3>
+                    <p className="text-xs text-slate-400">Capturez et convertissez directement des images médicales en format DICOM</p>
+                  </div>
+                  <Camera className="w-8 h-8 text-teal-400" />
+                </div>
+
+                {/* Camera Viewfinder */}
+                {!capturedPhoto ? (
+                  <div className="space-y-4">
+                    <div className="relative rounded-2xl overflow-hidden bg-black aspect-video flex items-center justify-center border border-slate-800">
+                      {cameraStream ? (
+                        <video 
+                          ref={(video) => {
+                            if (video && video.srcObject !== cameraStream) {
+                              video.srcObject = cameraStream;
+                              video.play().catch(err => console.error("Video play error:", err));
+                            }
+                          }}
+                          className="w-full h-full object-cover"
+                          playsInline
+                          muted
+                        />
+                      ) : (
+                        <div className="text-center p-6 space-y-4">
+                          <p className="text-sm text-slate-500">L'appareil photo n'est pas activé.</p>
+                          <button
+                            onClick={async () => {
+                              try {
+                                // Essayer d'abord la caméra arrière (environnement)
+                                try {
+                                  const stream = await navigator.mediaDevices.getUserMedia({
+                                    video: { facingMode: 'environment' }
+                                  });
+                                  setCameraStream(stream);
+                                } catch (innerErr) {
+                                  // Repli automatique sur n'importe quelle caméra disponible (webcam PC, etc.)
+                                  const stream = await navigator.mediaDevices.getUserMedia({
+                                    video: true
+                                  });
+                                  setCameraStream(stream);
+                                }
+                              } catch (e) {
+                                alert("Erreur d'accès à la caméra : " + e.message);
+                              }
+                            }}
+                            className="bg-teal-600 hover:bg-teal-500 text-white font-bold px-5 py-2.5 rounded-xl text-xs transition-all"
+                          >
+                            Activer l'objectif
+                          </button>
+                        </div>
+                      )}
+                    </div>
+                    {cameraStream && (
+                      <div className="flex justify-center gap-4">
+                        <button
+                          onClick={() => {
+                            const video = document.querySelector('video');
+                            if (video) {
+                              const canvas = document.createElement('canvas');
+                              canvas.width = video.videoWidth;
+                              canvas.height = video.videoHeight;
+                              const ctx = canvas.getContext('2d');
+                              ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+                              const dataUrl = canvas.toDataURL('image/jpeg');
+                              setCapturedPhoto(dataUrl);
+                              
+                              // Stop video stream
+                              cameraStream.getTracks().forEach(track => track.stop());
+                              setCameraStream(null);
+                            }
+                          }}
+                          className="bg-rose-600 hover:bg-rose-500 text-white font-bold px-6 py-3 rounded-xl text-sm transition-all shadow-lg shadow-rose-600/10 flex items-center gap-2"
+                        >
+                          Prendre la photo
+                        </button>
+                        <button
+                          onClick={() => {
+                            cameraStream.getTracks().forEach(track => track.stop());
+                            setCameraStream(null);
+                          }}
+                          className="bg-slate-800 hover:bg-slate-700 text-slate-300 font-bold px-5 py-3 rounded-xl text-sm transition-all"
+                        >
+                          Désactiver
+                        </button>
+                      </div>
+                    )}
+                  </div>
+                ) : (
+                  // Patient Association Form
+                  <div className="space-y-6">
+                    <div className="relative rounded-2xl overflow-hidden bg-slate-900 border border-slate-800 p-2">
+                      <img src={capturedPhoto} alt="Captured fundus" className="max-h-60 mx-auto rounded-xl object-contain" />
+                      <button
+                        onClick={() => {
+                          setCapturedPhoto(null);
+                          // Réactiver directement la caméra
+                          navigator.mediaDevices.getUserMedia({
+                            video: { facingMode: 'environment' }
+                          }).then(stream => setCameraStream(stream))
+                            .catch(err => console.error("Camera reload error:", err));
+                        }}
+                        className="absolute top-4 right-4 bg-slate-950/80 hover:bg-slate-900 text-slate-300 px-3 py-1.5 rounded-lg text-xs transition-colors border border-slate-800"
+                      >
+                        Reprendre la photo
+                      </button>
+                    </div>
+
+                    <div className="space-y-4">
+                      <h4 className="font-bold text-sm text-teal-400 uppercase tracking-wider">Métadonnées médicales du Patient</h4>
+                      <div className="grid grid-cols-2 gap-4">
+                        <div>
+                          <label className="text-xs font-bold text-slate-400 block mb-1">Nom complet</label>
+                          <input 
+                            type="text" 
+                            placeholder="ex: Jean Dupont"
+                            value={dicomPatient.name}
+                            onChange={(e) => setDicomPatient({ ...dicomPatient, name: e.target.value })}
+                            className="w-full bg-slate-900 border border-slate-700 rounded-xl p-3 text-sm text-white focus:outline-none focus:border-teal-500"
+                          />
+                        </div>
+                        <div>
+                          <label className="text-xs font-bold text-slate-400 block mb-1">Identifiant Unique (ID Patient)</label>
+                          <input 
+                            type="text" 
+                            placeholder="ex: PAT8234"
+                            value={dicomPatient.id}
+                            onChange={(e) => setDicomPatient({ ...dicomPatient, id: e.target.value })}
+                            className="w-full bg-slate-900 border border-slate-700 rounded-xl p-3 text-sm text-white focus:outline-none focus:border-teal-500"
+                          />
+                        </div>
+                      </div>
+                      <div>
+                        <label className="text-xs font-bold text-slate-400 block mb-1">Date de Naissance (Format JJMMAAAA)</label>
+                        <input 
+                          type="text" 
+                          placeholder="ex: 12051978"
+                          maxLength={8}
+                          value={dicomPatient.birthDate}
+                          onChange={(e) => setDicomPatient({ ...dicomPatient, birthDate: e.target.value })}
+                          className="w-full bg-slate-900 border border-slate-700 rounded-xl p-3 text-sm text-white focus:outline-none focus:border-teal-500"
+                        />
+                      </div>
+
+                      <button
+                        onClick={async () => {
+                          if (!dicomPatient.name || !dicomPatient.id) {
+                            return alert("Veuillez saisir au moins le nom et l'identifiant du patient.");
+                          }
+                          setIsSendingDicom(true);
+                          try {
+                            const res = await fetch(`${backendUrl}/api/dicom/upload`, {
+                              method: 'POST',
+                              headers: {
+                                'Content-Type': 'application/json',
+                                'Authorization': `Bearer ${token}`
+                              },
+                              body: JSON.stringify({
+                                patient_name: dicomPatient.name,
+                                patient_id: dicomPatient.id,
+                                birth_date: dicomPatient.birthDate || '19800101',
+                                image_base64: capturedPhoto
+                              })
+                            });
+                            if (res.ok) {
+                              alert("✓ Image convertie en DICOM et archivée dans le PACS Orthanc avec succès !");
+                              setCapturedPhoto(null);
+                              setDicomPatient({ name: '', id: '', birthDate: '' });
+                              fetchPatients(); // Rafraîchir
+                            } else {
+                              const err = await res.json();
+                              alert(`Erreur: ${err.error}`);
+                            }
+                          } catch (e) {
+                            console.error(e);
+                            alert("Erreur de connexion avec le PACS.");
+                          } finally {
+                            setIsSendingDicom(false);
+                          }
+                        }}
+                        disabled={isSendingDicom}
+                        className="w-full bg-teal-600 hover:bg-teal-500 disabled:bg-slate-800 text-white font-bold py-3 rounded-xl transition-all button-press flex justify-center items-center gap-2 shadow-lg shadow-teal-600/10 text-sm"
+                      >
+                        {isSendingDicom ? (
+                          <>
+                            <Loader2 className="w-5 h-5 animate-spin" /> Analyse en cours...
+                          </>
+                        ) : (
+                          <>
+                            Lancer l'examen (Sauvegarder DICOM)
+                          </>
+                        )}
+                      </button>
+                    </div>
+                  </div>
+                )}
+              </div>
             </div>
           )}
 

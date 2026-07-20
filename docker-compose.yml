@@ -8,6 +8,8 @@ services:
       - MONGO_URI=mongodb://${MONGO_ROOT_USERNAME}:${MONGO_ROOT_PASSWORD}@mongo:27017/${MONGO_DATABASE}?authSource=admin
       - RABBITMQ_URL=amqp://${RABBITMQ_DEFAULT_USER}:${RABBITMQ_DEFAULT_PASS}@rabbitmq:5672/%2F
       - GEMINI_API_KEY=${GEMINI_API_KEY}
+      - ORTHANC_URL=http://orthanc:8042/instances
+      - ORTHANC_AUTH=${ORTHANC_ADMIN_USER}:${ORTHANC_ADMIN_PASSWORD}
     networks:
       - ophtia-net
       - web
@@ -154,9 +156,31 @@ services:
         max-size: "50m"
         max-file: "3"
 
+  # PACS DICOM Server (Orthanc)
+  orthanc:
+    image: jodogne/orthanc-plugins:latest
+    container_name: opthia-orthanc
+    volumes:
+      - orthanc-data:/var/lib/orthanc/db
+      - ./orthanc-config/orthanc.json:/etc/orthanc/orthanc.json:ro
+    networks:
+      - ophtia-net
+    restart: always
+    healthcheck:
+      test: [ "CMD", "wget", "--spider", "--quiet", "http://localhost:8042/" ]
+      interval: 15s
+      timeout: 5s
+      retries: 3
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "50m"
+        max-file: "3"
+
 volumes:
   mongo-data:
   rabbitmq-data:
+  orthanc-data:
 
 networks:
   ophtia-net:
