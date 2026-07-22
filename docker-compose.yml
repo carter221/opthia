@@ -1,158 +1,139 @@
-version: '3.8'
-
 services:
   backend:
-    build: ./backend
-    ports:
-      - "5001:5000"
+    image: ghcr.io/sjudicael/opthia/backend:latest
+    container_name: opthia-backend
     volumes:
       - ./backend:/app
     environment:
-      - MONGO_URI=mongodb://mongo:27017/ophtia
-      - RABBITMQ_URL=amqp://guest:guest@rabbitmq:5672/%2F
+      - MONGO_URI=mongodb://${MONGO_ROOT_USERNAME}:${MONGO_ROOT_PASSWORD}@mongo:27017/${MONGO_DATABASE}?authSource=admin
+      - RABBITMQ_URL=amqp://${RABBITMQ_DEFAULT_USER}:${RABBITMQ_DEFAULT_PASS}@rabbitmq:5672/%2F
+      - GEMINI_API_KEY=${GEMINI_API_KEY}
+      - ORTHANC_URL=http://orthanc:8042/instances
+      - ORTHANC_AUTH=${ORTHANC_ADMIN_USER}:${ORTHANC_ADMIN_PASSWORD}
     networks:
       - ophtia-net
+      - web
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.backend-opthia.rule=Host(`api-ophtia.sjudicael.top`)"
+      - "traefik.http.routers.backend-opthia.entrypoints=https"
+      - "traefik.http.routers.backend-opthia.tls=true"
+      - "traefik.http.routers.backend-opthia.tls.certresolver=letsencrypt"
+      - "traefik.http.services.backend-opthia.loadbalancer.server.port=5000"
+      - "traefik.http.routers.backend-opthia.middlewares=security-headers@docker"
     depends_on:
-      - mongo
-      - rabbitmq
+      mongo:
+        condition: service_healthy
+      rabbitmq:
+        condition: service_healthy
     healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:5000/health"]
+      test: [ "CMD", "curl", "-f", "http://localhost:5000/health" ]
       interval: 10s
       timeout: 5s
       retries: 3
-
+    restart: always
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "50m"
+        max-file: "3"
+ 
   frontend:
-    build: ./frontend
-    ports:
-      - "8501:8501"
+    image: ghcr.io/sjudicael/opthia/frontend:latest
+    container_name: opthia-frontend
     volumes:
       - ./frontend:/app
+      - /app/node_modules
     networks:
       - ophtia-net
+      - web
     depends_on:
       - backend
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.frontend-opthia.rule=Host(`ophtia.sjudicael.top`)"
+      - "traefik.http.routers.frontend-opthia.entrypoints=https"
+      - "traefik.http.routers.frontend-opthia.tls=true"
+      - "traefik.http.routers.frontend-opthia.tls.certresolver=letsencrypt"
+      - "traefik.http.services.frontend-opthia.loadbalancer.server.port=80"
+      - "traefik.http.routers.frontend-opthia.middlewares=security-headers@docker"
+    restart: always
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "50m"
+        max-file: "3"
 
   mongo:
     image: mongo:latest
-    ports:
-      - "27017:27017"
+    environment:
+      - MONGO_INITDB_ROOT_USERNAME=${MONGO_ROOT_USERNAME}
+      - MONGO_INITDB_ROOT_PASSWORD=${MONGO_ROOT_PASSWORD}
+      - MONGO_INITDB_DATABASE=${MONGO_DATABASE}
     volumes:
       - mongo-data:/data/db
     networks:
       - ophtia-net
+    healthcheck:
+      test: [ "CMD", "mongosh", "-u", "${MONGO_ROOT_USERNAME}", "-p", "${MONGO_ROOT_PASSWORD}", "--authenticationDatabase", "admin", "--eval", "db.adminCommand('ping')" ]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+    restart: always
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "50m"
+        max-file: "3"
 
-  # MongoDB Web UI
+  # MongoDB Web UI (accessible uniquement via le réseau interne)
   mongo-express:
     image: mongo-express:latest
-    ports:
-      - "8081:8081"
     environment:
-      - ME_CONFIG_MONGODB_URL=mongodb://mongo:27017/ophtia
-      - ME_CONFIG_BASICAUTH_USERNAME=admin
-      - ME_CONFIG_BASICAUTH_PASSWORD=admin123
+      - ME_CONFIG_MONGODB_URL=mongodb://${MONGO_ROOT_USERNAME}:${MONGO_ROOT_PASSWORD}@mongo:27017/${MONGO_DATABASE}?authSource=admin
+      - ME_CONFIG_BASICAUTH_USERNAME=${ME_CONFIG_BASICAUTH_USERNAME}
+      - ME_CONFIG_BASICAUTH_PASSWORD=${ME_CONFIG_BASICAUTH_PASSWORD}
     depends_on:
-      - mongo
+      mongo:
+        condition: service_healthy
     networks:
-      - ophtia-net  
+      - ophtia-net
     restart: always
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "50m"
+        max-file: "3"
 
   # RabbitMQ - Message Broker
   rabbitmq:
     image: rabbitmq:3.12-management-alpine
-    ports:
-      - "5672:5672"      # AMQP port
-      - "15672:15672"    # Management UI
     environment:
-      RABBITMQ_DEFAULT_USER: guest
-      RABBITMQ_DEFAULT_PASS: guest
+      RABBITMQ_DEFAULT_USER: ${RABBITMQ_DEFAULT_USER}
+      RABBITMQ_DEFAULT_PASS: ${RABBITMQ_DEFAULT_PASS}
     volumes:
       - rabbitmq-data:/var/lib/rabbitmq
     networks:
       - ophtia-net
     healthcheck:
-      test: ["CMD", "rabbitmq-diagnostics", "-q", "ping"]
+      test: [ "CMD", "rabbitmq-diagnostics", "-q", "ping" ]
       interval: 10s
       timeout: 5s
       retries: 3
     restart: always
-
-  # PostgreSQL pour Airflow
-  postgres:
-    image: postgres:15-alpine
-    ports:
-      - "5432:5432"
-    environment:
-      - POSTGRES_USER=airflow
-      - POSTGRES_PASSWORD=airflow
-      - POSTGRES_DB=airflow
-    volumes:
-      - postgres-data:/var/lib/postgresql/data
-    networks:
-      - ophtia-net
-    healthcheck:
-      test: ["CMD", "pg_isready", "-U", "airflow"]
-      interval: 10s
-      timeout: 5s
-      retries: 3
-
-  # Airflow Scheduler
-  airflow-scheduler:
-    build: ./airflow
-    command: scheduler
-    environment:
-      - AIRFLOW__CORE__DAGS_FOLDER=/opt/airflow/dags
-      - AIRFLOW__CORE__EXECUTOR=LocalExecutor
-      - AIRFLOW__DATABASE__SQL_ALCHEMY_CONN=postgresql+psycopg2://airflow:airflow@postgres:5432/airflow
-      - AIRFLOW__CORE__LOAD_EXAMPLES=False
-      - MONGO_URI=mongodb://mongo:27017/ophtia
-    volumes:
-      - ./airflow/dags:/opt/airflow/dags
-      - ./airflow/logs:/opt/airflow/logs
-      - ./airflow/plugins:/opt/airflow/plugins
-      - ./backend/models:/app/models
-    networks:
-      - ophtia-net
-    depends_on:
-      - postgres
-      - mongo
-    restart: always
-
-  # Airflow Webserver
-  airflow-webserver:
-    build: ./airflow
-    command: bash -c "airflow db init && airflow users create --username admin --firstname Admin --lastname User --role Admin --email admin@ophtia.local --password admin 2>/dev/null || true && airflow webserver"
-    ports:
-      - "8080:8080"
-    environment:
-      - AIRFLOW__CORE__DAGS_FOLDER=/opt/airflow/dags
-      - AIRFLOW__CORE__EXECUTOR=LocalExecutor
-      - AIRFLOW__DATABASE__SQL_ALCHEMY_CONN=postgresql+psycopg2://airflow:airflow@postgres:5432/airflow
-      - AIRFLOW__CORE__LOAD_EXAMPLES=False
-      - MONGO_URI=mongodb://mongo:27017/ophtia
-    volumes:
-      - ./airflow/dags:/opt/airflow/dags
-      - ./airflow/logs:/opt/airflow/logs
-      - ./airflow/plugins:/opt/airflow/plugins
-      - ./backend/models:/app/models
-    networks:
-      - ophtia-net
-    depends_on:
-      - postgres
-      - mongo
-    restart: always
-    healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:8080/health"]
-      interval: 10s
-      timeout: 5s
-      retries: 3
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "50m"
+        max-file: "3"
 
   # RabbitMQ Worker(s)
   worker-1:
-    build: ./backend
+    image: ghcr.io/sjudicael/opthia/backend:latest
     command: python3 workers/consumer.py
     environment:
-      - MONGO_URI=mongodb://mongo:27017/ophtia
-      - RABBITMQ_URL=amqp://guest:guest@rabbitmq:5672/%2F
+      - MONGO_URI=mongodb://${MONGO_ROOT_USERNAME}:${MONGO_ROOT_PASSWORD}@mongo:27017/${MONGO_DATABASE}?authSource=admin
+      - RABBITMQ_URL=amqp://${RABBITMQ_DEFAULT_USER}:${RABBITMQ_DEFAULT_PASS}@rabbitmq:5672/%2F
     volumes:
       - ./backend:/app
       - ./backend/models:/app/models
@@ -165,16 +146,44 @@ services:
         condition: service_started
     restart: always
     healthcheck:
-      test: ["CMD", "ps", "aux"]
+      test: [ "CMD", "ps", "aux" ]
       interval: 30s
       timeout: 10s
       retries: 3
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "50m"
+        max-file: "3"
+
+  # PACS DICOM Server (Orthanc)
+  orthanc:
+    image: jodogne/orthanc-plugins:latest
+    container_name: opthia-orthanc
+    volumes:
+      - orthanc-data:/var/lib/orthanc/db
+      - ./orthanc-config/orthanc.json:/etc/orthanc/orthanc.json:ro
+    networks:
+      - ophtia-net
+    restart: always
+    healthcheck:
+      test: [ "CMD", "wget", "--spider", "--quiet", "http://localhost:8042/" ]
+      interval: 15s
+      timeout: 5s
+      retries: 3
+    logging:
+      driver: "json-file"
+      options:
+        max-size: "50m"
+        max-file: "3"
 
 volumes:
   mongo-data:
-  postgres-data:
   rabbitmq-data:
+  orthanc-data:
 
 networks:
   ophtia-net:
     driver: bridge
+  web:
+    external: true

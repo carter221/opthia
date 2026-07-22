@@ -95,3 +95,7 @@ postgres-data/
 *.tmp
 *.bak
 *.backup
+
+# Orthanc PACS configuration and volume data
+orthanc-config/orthanc.json
+orthanc-data/

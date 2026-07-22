@@ -3,6 +3,7 @@ FROM python:3.10-slim
 
 # Installer uniquement les dépendances système essentielles
 RUN apt-get update && apt-get install -y --no-install-recommends \
+    curl \
     libsm6 \
     libxext6 \
     libxrender-dev \

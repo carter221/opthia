@@ -22,6 +22,8 @@ from albumentations.pytorch import ToTensorV2  # noqa: F401
 import torchvision.transforms as transforms
 import signal
 import sys
+from huggingface_hub import hf_hub_download
+from ultralytics import YOLO
 
 # Configuration logging
 logging.basicConfig(
@@ -33,7 +35,7 @@ logger = logging.getLogger(__name__)
 
 # ========== CLASSE GRADCAM ==========
 class GradCAM:
-    """Génère les heatmaps Grad-CAM pour l'explicabilité."""
+    """Génère les heatmaps Grad-CAM pour l'explicabilité (supporte multiclasse et 1 sortie binaire)."""
     def __init__(self, model, target_layer):
         self.model = model
         self.target_layer = target_layer
@@ -42,7 +44,7 @@ class GradCAM:
 
         # Register hooks
         target_layer.register_forward_hook(self._forward_hook)
-        target_layer.register_backward_hook(self._backward_hook)
+        target_layer.register_full_backward_hook(self._backward_hook)
 
     def _forward_hook(self, module, input, output):
         self.activations = output.detach()
@@ -50,7 +52,7 @@ class GradCAM:
     def _backward_hook(self, module, grad_input, grad_output):
         self.gradients = grad_output[0].detach()
 
-    def generate_cam(self, x):
+    def generate_cam(self, x, model_type='rd', pred_label=1.0):
         # Forward pass
         self.model.zero_grad()
         output = self.model(x)
@@ -58,14 +60,23 @@ class GradCAM:
         if isinstance(output, tuple):
             output = output[0]
 
-        # Backward pass
-        score = output.max()
+        # Calcul du score à rétropropager
+        if model_type == 'rd':
+            # Multiclasse : on cherche le score maximal ou la classe cible
+            score = output.max()
+        else:
+            # 1 sortie binaire (Glaucome) avec logit
+            logit = output.squeeze()
+            if logit.dim() > 0:
+                logit = logit.sum()
+            # Si prédit Sain (0.0), on cherche ce qui le pousse vers le négatif, sinon le positif
+            score = -logit if pred_label == 0.0 else logit
+
         self.model.zero_grad()
         score.backward()
 
         # Compute CAM
         if self.gradients is None or self.activations is None:
-            # Fallback: create a simple heatmap
             return np.ones((512, 512), dtype=np.float32) * 0.5
 
         gradients = self.gradients[0].cpu().numpy()
@@ -223,6 +234,110 @@ def crop_image_from_gray(img, tol=10):
     return img
 
 
+# Cache global pour le modèle YOLO
+yolo_disc_model = None
+
+def detect_and_crop_optic_disc(img_np, crop_size=256):
+    """
+    Détecte automatiquement le disque optique sur un fond d'œil
+    en appliquant CLAHE (rehaussement de contraste) et en cherchant la zone la plus claire 
+    dans la zone anatomique médiane (droite ou gauche selon l'œil).
+    """
+    try:
+        # Enlever d'abord les bords noirs pour travailler sur la rétine utile
+        img_cropped = crop_image_from_gray(img_np, tol=10)
+        h_orig, w_orig, _ = img_cropped.shape
+        
+        # 1. Travailler sur une grille standardisée de 800x800
+        std_size = 800
+        img_std = cv2.resize(img_cropped, (std_size, std_size))
+        
+        # 2. Convertir en YCrCb et extraire la luminance Y (plus stable que le canal rouge)
+        ycrcb = cv2.cvtColor(img_std, cv2.COLOR_RGB2YCrCb)
+        y_channel = ycrcb[:, :, 0]
+        
+        # 3. Appliquer CLAHE pour normaliser le contraste global
+        clahe = cv2.createCLAHE(clipLimit=3.0, tileGridSize=(8, 8))
+        contrast_enhanced = clahe.apply(y_channel)
+        
+        # Lissage pour éliminer les vaisseaux fins
+        blurred = cv2.GaussianBlur(contrast_enhanced, (35, 35), 0)
+        
+        # 4. Définir les zones de recherche anatomiques (bande équatoriale centrale stricte)
+        # Le disque optique est TOUJOURS situé entre 20% et 90% de la largeur,
+        # et strictement centré verticalement (entre 42% et 58% de la hauteur).
+        mask = np.zeros_like(blurred)
+        y_start = int(std_size * 0.42)
+        y_end = int(std_size * 0.58)
+        x_start = int(std_size * 0.20)
+        x_end = int(std_size * 0.90)
+        
+        cv2.rectangle(mask, (x_start, y_start), (x_end, y_end), 255, -1)
+        masked_blurred = cv2.bitwise_and(blurred, mask)
+        
+        # 5. Trouver le point le plus clair (Luminance Maximale)
+        _, _, _, max_loc = cv2.minMaxLoc(masked_blurred)
+        cx_std, cy_std = max_loc
+        
+        # 6. Projeter les coordonnées sur la taille d'origine de l'image
+        cx = int(cx_std * (w_orig / std_size))
+        cy = int(cy_std * (h_orig / std_size))
+        
+        logger.info(f"✓ Disque optique localisé par luminance Y-CLAHE à ({cx}, {cy}) sur l'image d'origine")
+        
+        # 7. Découper la zone autour de la coordonnée projetée (taille proportionnelle à l'image d'origine)
+        # Le disque optique représente environ 30% de la largeur totale de l'œil pour un zoom modéré
+        crop_size_dynamic = int(w_orig * 0.30)
+        # S'assurer d'une taille minimale de 256 pixels
+        crop_size_dynamic = max(256, crop_size_dynamic)
+        
+        half_size = crop_size_dynamic // 2
+        x_min = max(0, cx - half_size)
+        y_min = max(0, cy - half_size)
+        x_max = min(w_orig, cx + half_size)
+        y_max = min(h_orig, cy + half_size)
+        
+        # Ajustement pour garantir un carré parfait de la taille demandée
+        if x_min == 0:
+            x_max = min(w_orig, crop_size_dynamic)
+        if y_min == 0:
+            y_max = min(h_orig, crop_size_dynamic)
+        if x_max == w_orig:
+            x_min = max(0, w_orig - crop_size_dynamic)
+        if y_max == h_orig:
+            y_min = max(0, h_orig - crop_size_dynamic)
+            
+        final_cropped = img_cropped[y_min:y_max, x_min:x_max]
+        
+        if final_cropped.size == 0 or final_cropped.shape[0] < 100 or final_cropped.shape[1] < 100:
+            return img_np, False
+            
+        # --- TEST DE ROBUSTESSE ET HIERARCHISATION DU NERF OPTIQUE ---
+        # Le disque optique est de loin la structure la plus brillante de la rétine.
+        # Si la détection a réussi, la luminance moyenne du crop après CLAHE doit être très élevée.
+        # Si le crop tombe sur de la rétine sombre ou des reflets de flash ponctuels,
+        # la luminance Y moyenne sera faible car CLAHE ne compense pas le manque de structure.
+        try:
+            crop_std = cv2.resize(final_cropped, (128, 128))
+            crop_ycrcb = cv2.cvtColor(crop_std, cv2.COLOR_RGB2YCrCb)
+            crop_y = crop_ycrcb[:, :, 0]
+            # Un vrai disque optique a une intensité moyenne de luminance importante (> 135)
+            mean_lum = np.mean(crop_y)
+            logger.info(f"→ Luminance moyenne du crop détecté : {mean_lum:.2f} (seuil min requis: 135.0)")
+            
+            if mean_lum < 135.0:
+                logger.warning("⚠ Le crop détecté est trop sombre pour être un disque optique. Échec de la localisation.")
+                return img_np, False
+        except Exception as e:
+            logger.warning(f"Erreur lors du calcul de la luminance du crop: {e}")
+            return img_np, False
+            
+        return final_cropped, True
+    except Exception as e:
+        logger.warning(f"Erreur lors de la détection du disque optique: {e}. Fallback sur image brute.")
+        return img_np, False
+
+
 def get_prediction_transforms(model_type):
     """Retourne le pipeline de transformation."""
     if model_type == 'rd':
@@ -242,14 +357,18 @@ def get_prediction_transforms(model_type):
 def process_diagnostic_task(task_data):
     """Traite une tâche de diagnostic."""
     task_id = task_data.get('task_id')
-    image_base64 = task_data.get('image_base64')
+    batch_id = task_data.get('batch_id')
+    image_base64_raw = task_data.get('image_base64')
     model_type = task_data.get('model_type')
     filename = task_data.get('filename', 'unknown')
+    patient_name = task_data.get('patient_name', 'Patient Anonyme')
+    user_email = task_data.get('user_email')
 
-    logger.info(f"[Worker] Traitement: task_id={task_id}, model={model_type}")
+    logger.info(f"[Worker] Traitement: task_id={task_id}, batch_id={batch_id}, model={model_type}")
 
     try:
         # Décodage image
+        image_base64 = image_base64_raw
         if image_base64.startswith('data:'):
             image_base64 = image_base64.split(',')[1]
 
@@ -261,6 +380,23 @@ def process_diagnostic_task(task_data):
         if model_type == 'rd':
             image_np = crop_image_from_gray(image_np, tol=10)
             image_np = cv2.resize(image_np, (512, 512))
+        elif model_type == 'glaucoma':
+            # 1. Tenter la localisation automatique du nerf optique
+            cropped_image, crop_success = detect_and_crop_optic_disc(image_np, crop_size=256)
+            
+            if crop_success:
+                logger.info("✓ Diagnostic basé sur le crop du nerf optique (Zoom 30%)")
+                image_np = cropped_image
+            else:
+                logger.info("⚠ Bascule sur l'image entière de Graham (Échec de localisation du nerf)")
+                image_np = crop_image_from_gray(image_np, tol=10)
+                try:
+                    image_np = cv2.resize(image_np, (512, 512))
+                    sigmaX = 10
+                    gaussian_blur = cv2.GaussianBlur(image_np, (0, 0), sigmaX)
+                    image_np = cv2.addWeighted(image_np, 4, gaussian_blur, -4, 128)
+                except Exception as e:
+                    logger.warning(f"Impossible d'appliquer le traitement Ben Graham global: {e}")
 
         # Transformations
         transforms_pipeline = get_prediction_transforms(model_type)
@@ -280,21 +416,6 @@ def process_diagnostic_task(task_data):
         # Prédiction
         model = models_cache[model_type]
 
-        # Générer Grad-CAM
-        try:
-            if model_type == 'rd':
-                target_layer = model.backbone.layer4
-            else:
-                target_layer = model.features[-1]
-
-            gradcam = GradCAM(model, target_layer)
-            cam = gradcam.generate_cam(input_tensor)
-            heatmap_image = apply_heatmap_to_image(image_np, cam, alpha=0.5, resize_to=(256, 256))
-            grad_cam_base64 = encode_image_to_base64(heatmap_image)
-        except Exception as e:
-            logger.warning(f"Grad-CAM non généré: {e}")
-            grad_cam_base64 = None
-
         with torch.no_grad():
             output = model(input_tensor)
 
@@ -303,11 +424,29 @@ def process_diagnostic_task(task_data):
                 prediction_multiclass = torch.argmax(probabilities, dim=1).item()
                 prediction_binary = 0 if prediction_multiclass == 0 else 1
 
-                # Afficher la probabilité de la classe prédite (pas toujours classe 0)
+                # Afficher la probabilité de la classe prédite
                 if prediction_binary == 0:
                     confidence = float(probabilities[0, 0].item())
                 else:
                     confidence = float(probabilities[0, prediction_multiclass].item())
+
+                # Générer Grad-CAM après calcul de la classe prédite
+                try:
+                    target_layer = model.backbone.layer4
+                    gradcam = GradCAM(model, target_layer)
+                    # Utiliser le contexte d'évaluation du gradient (nécessite d'activer temporairement require_grad sur l'entrée)
+                    with torch.enable_grad():
+                        # Ré-inférence locale avec gradients activés pour Grad-CAM
+                        input_tensor_grad = input_tensor.clone().detach().requires_grad_(True)
+                        cam = gradcam.generate_cam(input_tensor_grad, model_type='rd', pred_label=float(prediction_binary))
+                    
+                    # Pour OpenCV, on convertit l'image RGB en BGR temporairement pour appliquer la heatmap
+                    image_bgr = cv2.cvtColor(image_np, cv2.COLOR_RGB2BGR)
+                    heatmap_image = apply_heatmap_to_image(image_bgr, cam, alpha=0.5, resize_to=(256, 256))
+                    grad_cam_base64 = encode_image_to_base64(heatmap_image)
+                except Exception as e:
+                    logger.warning(f"Grad-CAM non généré: {e}")
+                    grad_cam_base64 = None
 
                 result_data = {
                     'prediction_class': int(prediction_binary),
@@ -320,38 +459,74 @@ def process_diagnostic_task(task_data):
                         'class_3': float(probabilities[0, 3].item()),
                         'class_4': float(probabilities[0, 4].item()),
                     },
-                    'recommendation': ("⚠️ RÉTINOPATHIE DÉTECTÉE" if
+                    'recommendation': ("⚠️ RÉTINOPATHIE DÉTECTÉE - À surveiller de près" if
                                        prediction_binary == 1
-                                       else "✅ Aucune RD"),
+                                       else "✅ Saine - Absence de Rétinopathie Diabétique"),
                     'grad_cam': grad_cam_base64,
                 }
 
                 result = {
                     'task_id': task_id,
+                    'batch_id': batch_id,
                     'result': result_data,
                     'model_type': model_type,
-                    'status': 'completed',
-                    'filename': filename,
+                                  'image_base64': image_base64_raw,  # Sauvegarder pour le réapprentissage interne
+                    'user_email': user_email,
                     'timestamp': datetime.utcnow()
                 }
             else:
                 probability = torch.sigmoid(output).item()
-                prediction = 1 if probability > 0.5 else 0
-
+                # Seuil clinique adapté (0.30) sans inversion logique (1 = Glaucome, 0 = Sain)
+                prediction_corrected = 1 if probability > 0.30 else 0
+ 
+                # Confiance : probabilité associée à la classe prédite
+                confidence = (1.0 - probability) if prediction_corrected == 0 else probability
+ 
+                # Générer Grad-CAM après calcul de la classe prédite
+                try:
+                    target_layer = model.features[-1]
+                    gradcam = GradCAM(model, target_layer)
+                    with torch.enable_grad():
+                        input_tensor_grad = input_tensor.clone().detach().requires_grad_(True)
+                        cam = gradcam.generate_cam(input_tensor_grad, model_type='glaucoma', pred_label=float(prediction_corrected))
+                    
+                    # Pour OpenCV, on convertit l'image RGB en BGR temporairement pour appliquer la heatmap
+                    image_bgr = cv2.cvtColor(image_np, cv2.COLOR_RGB2BGR)
+                    heatmap_image = apply_heatmap_to_image(image_bgr, cam, alpha=0.5, resize_to=(256, 256))
+                    grad_cam_base64 = encode_image_to_base64(heatmap_image)
+                except Exception as e:
+                    logger.warning(f"Grad-CAM non généré: {e}")
+                    grad_cam_base64 = None
+ 
                 result_data = {
-                    'prediction_class': int(prediction),
-                    'probability': probability,
-                    'recommendation': ("⚠️ GLAUCOME DÉTECTÉ" if prediction == 1
-                                       else "✅ Aucun glaucome"),
+                    'prediction_class': int(prediction_corrected),
+                    'probability': confidence,
+                    'recommendation': ("⚠️ GLAUCOME DÉTECTÉ - Suspicion de glaucome" if prediction_corrected == 1
+                                       else "✅ Sain - Absence de signes de glaucome"),
                     'grad_cam': grad_cam_base64,
                 }
-
+ 
+                # Encoder l'image recadrée pour la renvoyer au frontend afin d'avoir une superposition cohérente
+                try:
+                    # Conversion en BGR pour un encodage JPEG OpenCV standardisé
+                    image_bgr_final = cv2.cvtColor(image_np, cv2.COLOR_RGB2BGR)
+                    success, buffer = cv2.imencode('.jpg', image_bgr_final, [cv2.IMWRITE_JPEG_QUALITY, 95])
+                    image_base64_final = "data:image/jpeg;base64," + base64.b64encode(buffer).decode('utf-8')
+                except Exception as e:
+                    logger.warning(f"Impossible d'encoder le crop oculaire: {e}")
+                    image_base64_final = image_base64_raw
+ 
                 result = {
                     'task_id': task_id,
+                    'batch_id': batch_id,
                     'result': result_data,
                     'model_type': model_type,
                     'status': 'completed',
                     'filename': filename,
+                    'patient_name': patient_name,
+                    'image_base64': image_base64_raw,  # Image brute d'origine
+                    'image_cropped_base64': image_base64_final,  # Version recadrée zoomée
+                    'user_email': user_email,
                     'timestamp': datetime.utcnow()
                 }
 
@@ -367,8 +542,12 @@ def process_diagnostic_task(task_data):
         if db is not None:
             db.diagnostic_results.insert_one({
                 'task_id': task_id,
+                'batch_id': batch_id,
                 'status': 'failed',
                 'error': str(e),
+                'patient_name': patient_name,
+                'filename': filename,
+                'user_email': user_email,
                 'timestamp': datetime.utcnow()
             })
         raise

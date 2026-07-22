@@ -1,0 +1,80 @@
+@import "tailwindcss";
+
+:root {
+  font-family: 'Outfit', 'Inter', system-ui, Avenir, Helvetica, Arial, sans-serif;
+  line-height: 1.5;
+  font-weight: 400;
+
+  color-scheme: dark;
+  --bg-primary: #0b111e;
+  --bg-secondary: #131c2e;
+  --bg-tertiary: #1b263b;
+  --text-primary: #f8fafc;
+  --text-secondary: #94a3b8;
+  
+  --color-brand: #0d9488; /* Emerald Teal */
+  --color-brand-light: #2dd4bf;
+  --color-brand-rgb: 13, 148, 136;
+  
+  --color-safe: #10b981;
+  --color-safe-light: #34d399;
+  
+  --color-alert: #f43f5e; /* Coral/Rose */
+  --color-alert-light: #fb7185;
+
+  background-color: var(--bg-primary);
+  color: var(--text-primary);
+
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+::-webkit-scrollbar-track {
+  background: var(--bg-primary);
+}
+::-webkit-scrollbar-thumb {
+  background: var(--bg-tertiary);
+  border-radius: 4px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: var(--color-brand);
+}
+
+/* Glassmorphism utility */
+.glass {
+  background: rgba(19, 28, 46, 0.7);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.glow-teal {
+  box-shadow: 0 0 25px rgba(13, 148, 136, 0.15);
+}
+
+/* Custom easing animation curves */
+.ease-apple {
+  transition: all 400ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.button-press {
+  transition: transform 150ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.button-press:active {
+  transform: scale(0.96);
+}

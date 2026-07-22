@@ -1,0 +1,14 @@
+{
+  "Name" : "Opthia PACS Example",
+  "StorageDirectory" : "/var/lib/orthanc/db",
+  "IndexDirectory" : "/var/lib/orthanc/db",
+  "StorageCompression" : false,
+  "AuthenticationEnabled" : true,
+  "RegisteredUsers" : {
+    "orthanc" : "your_secure_password_here"
+  },
+  "DicomPort" : 4242,
+  "HttpPort" : 8042,
+  "RemoteAccessAllowed" : true,
+  "DicomAet" : "ORTHANC"
+}
