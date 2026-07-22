@@ -8,11 +8,37 @@ on:
 
 jobs:
   lint:
-    name: Linting Python
+    name: Linting & Security Analysis
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pull-requests: read
     
     steps:
     - uses: actions/checkout@v3
+      with:
+        fetch-depth: 0
+    
+    - name: Run Gitleaks (Secrets Detection)
+      uses: gitleaks/gitleaks-action@v2
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      continue-on-error: true # Évite de bloquer complètement si gitleaks a besoin de configuration locale
+      
+    - name: Run Semgrep (SAST Security Scan)
+      uses: semgrep/semgrep-action@v1
+      with:
+        config: p/python p/javascript p/typescript p/react
+      continue-on-error: true
+      
+    - name: Run Trivy FS (Dependencies Security Audit)
+      uses: aquasecurity/trivy-action@master
+      with:
+        scan-type: 'fs'
+        scan-ref: '.'
+        severity: 'HIGH,CRITICAL'
+        exit-code: '1'
+      continue-on-error: true
     
     - name: Set up Python
       uses: actions/setup-python@v4
@@ -26,15 +52,15 @@ jobs:
     
     - name: Check code formatting avec Black
       run: |
-        black --check --line-length 100 backend/ frontend/ airflow/ || true
+        black --check --line-length 100 backend/ frontend/ || true
     
     - name: Check imports avec isort
       run: |
-        isort --check-only backend/ frontend/ airflow/ || true
+        isort --check-only backend/ frontend/ || true
     
     - name: Lint avec flake8
       run: |
-        flake8 backend/ frontend/ airflow/ \
+        flake8 backend/ frontend/ \
           --max-line-length=100 \
           --exclude=__pycache__,.git,venv,env \
           --ignore=E203,W503

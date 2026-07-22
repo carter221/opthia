@@ -59,6 +59,7 @@ export default function App() {
 
   // Toggle States for Modal Image preview
   const [showGradCam, setShowGradCam] = useState(true);
+  const [viewMode, setViewMode] = useState('raw'); // 'raw', 'cropped', 'gradcam'
   const [isFullScreenImage, setIsFullScreenImage] = useState(false);
 
   // Stats
@@ -507,12 +508,12 @@ export default function App() {
       <aside className="w-72 bg-[#131c2e] border-r border-slate-800 flex flex-col justify-between">
         <div>
           <div className="p-6 flex items-center gap-3 border-b border-slate-800">
-            <div className="p-2 bg-teal-600/20 text-teal-400 rounded-xl">
-              <Activity className="w-8 h-8" />
+            <div className="w-12 h-12 rounded-xl overflow-hidden bg-teal-950/20 border border-teal-500/20 flex items-center justify-center">
+              <img src="/logo.png" alt="OPTHIA CLINIC Logo" className="w-full h-full object-cover scale-110" />
             </div>
             <div>
-              <h1 className="font-bold text-xl tracking-tight text-white">OPTHIA</h1>
-              <span className="text-xs text-teal-400 font-semibold tracking-wider uppercase">V2 PRO CLINIC</span>
+              <h1 className="font-bold text-lg tracking-tight text-white leading-none">OPTHIA</h1>
+              <span className="text-[10px] text-teal-400 font-bold tracking-wider uppercase">CLINIC V2 PRO</span>
             </div>
           </div>
           
@@ -746,6 +747,7 @@ export default function App() {
                           <button 
                             onClick={async () => {
                               setSelectedPatient(patient);
+                              setViewMode('raw');
                               setChatHistory([]);
                               try {
                                 const chatRes = await fetch(`${backendUrl}/api/chat/${patient.task_id}`, {
@@ -1209,26 +1211,51 @@ export default function App() {
                 <div className="flex justify-between items-center bg-slate-900/60 p-2 rounded-xl border border-slate-800">
                   <span className="text-xs font-bold text-slate-300 ml-2">Mode de visualisation</span>
                   <div className="flex gap-2">
-                    <button 
-                      onClick={() => setShowGradCam(false)}
-                      className={`px-3 py-1 rounded-lg text-xs font-bold transition-all ${!showGradCam ? 'bg-teal-600 text-white' : 'text-slate-400 hover:text-white'}`}
-                    >
-                      Image brute
-                    </button>
-                    <button 
-                      onClick={() => setShowGradCam(true)}
-                      className={`px-3 py-1 rounded-lg text-xs font-bold transition-all ${showGradCam ? 'bg-teal-600 text-white' : 'text-slate-400 hover:text-white'}`}
-                    >
-                      Grad-CAM Heatmap
-                    </button>
+                    {selectedPatient.model_type === 'glaucoma' ? (
+                      <>
+                        <button 
+                          onClick={() => setViewMode('raw')}
+                          className={`px-3 py-1 rounded-lg text-xs font-bold transition-all ${viewMode === 'raw' ? 'bg-teal-600 text-white' : 'text-slate-400 hover:text-white'}`}
+                        >
+                          Image brute
+                        </button>
+                        <button 
+                          onClick={() => setViewMode('cropped')}
+                          className={`px-3 py-1 rounded-lg text-xs font-bold transition-all ${viewMode === 'cropped' ? 'bg-teal-600 text-white' : 'text-slate-400 hover:text-white'}`}
+                        >
+                          Image crop
+                        </button>
+                        <button 
+                          onClick={() => setViewMode('gradcam')}
+                          className={`px-3 py-1 rounded-lg text-xs font-bold transition-all ${viewMode === 'gradcam' ? 'bg-teal-600 text-white' : 'text-slate-400 hover:text-white'}`}
+                        >
+                          Grad-CAM Heatmap
+                        </button>
+                      </>
+                    ) : (
+                      <>
+                        <button 
+                          onClick={() => setViewMode('raw')}
+                          className={`px-3 py-1 rounded-lg text-xs font-bold transition-all ${viewMode === 'raw' ? 'bg-teal-600 text-white' : 'text-slate-400 hover:text-white'}`}
+                        >
+                          Image brute
+                        </button>
+                        <button 
+                          onClick={() => setViewMode('gradcam')}
+                          className={`px-3 py-1 rounded-lg text-xs font-bold transition-all ${viewMode === 'gradcam' ? 'bg-teal-600 text-white' : 'text-slate-400 hover:text-white'}`}
+                        >
+                          Grad-CAM Heatmap
+                        </button>
+                      </>
+                    )}
                   </div>
                 </div>
-
+ 
                 <div 
                   onClick={() => setIsFullScreenImage(true)}
                   className="relative rounded-2xl overflow-hidden bg-slate-950 aspect-video flex items-center justify-center border border-slate-800 cursor-zoom-in group"
                 >
-                  {showGradCam ? (
+                  {viewMode === 'gradcam' ? (
                     selectedPatient.result?.grad_cam ? (
                       <img 
                         src={selectedPatient.result.grad_cam} 
@@ -1239,6 +1266,19 @@ export default function App() {
                       <div className="text-slate-500 text-sm flex flex-col items-center gap-2">
                         <AlertCircle className="w-8 h-8" />
                         <span>Heatmap Grad-CAM non disponible</span>
+                      </div>
+                    )
+                  ) : viewMode === 'cropped' ? (
+                    selectedPatient.image_cropped_base64 ? (
+                      <img 
+                        src={selectedPatient.image_cropped_base64} 
+                        alt="Cropped eye disc" 
+                        className="max-h-full object-contain transition-transform duration-300 group-hover:scale-[1.02]"
+                      />
+                    ) : (
+                      <div className="text-slate-500 text-sm flex flex-col items-center gap-2">
+                        <AlertCircle className="w-8 h-8" />
+                        <span>Image recadrée non disponible</span>
                       </div>
                     )
                   ) : (
@@ -1419,12 +1459,43 @@ export default function App() {
           className="fixed inset-0 z-50 bg-black/95 backdrop-blur-md flex flex-col justify-center items-center p-4 cursor-zoom-out"
         >
           <div className="absolute top-4 right-4 flex gap-4 z-55" onClick={e => e.stopPropagation()}>
-            <button 
-              onClick={() => setShowGradCam(!showGradCam)}
-              className="bg-slate-800/80 hover:bg-slate-700 text-white font-bold px-4 py-2 rounded-xl text-xs transition-colors border border-slate-700"
-            >
-              {showGradCam ? "Afficher l'image brute" : "Afficher le Grad-CAM"}
-            </button>
+            {selectedPatient.model_type === 'glaucoma' ? (
+              <>
+                <button 
+                  onClick={() => setViewMode('raw')}
+                  className={`px-4 py-2 rounded-xl text-xs font-bold transition-all ${viewMode === 'raw' ? 'bg-teal-600 text-white' : 'bg-slate-800 text-slate-400 border border-slate-700'}`}
+                >
+                  Image brute
+                </button>
+                <button 
+                  onClick={() => setViewMode('cropped')}
+                  className={`px-4 py-2 rounded-xl text-xs font-bold transition-all ${viewMode === 'cropped' ? 'bg-teal-600 text-white' : 'bg-slate-800 text-slate-400 border border-slate-700'}`}
+                >
+                  Image crop
+                </button>
+                <button 
+                  onClick={() => setViewMode('gradcam')}
+                  className={`px-4 py-2 rounded-xl text-xs font-bold transition-all ${viewMode === 'gradcam' ? 'bg-teal-600 text-white' : 'bg-slate-800 text-slate-400 border border-slate-700'}`}
+                >
+                  Grad-CAM
+                </button>
+              </>
+            ) : (
+              <>
+                <button 
+                  onClick={() => setViewMode('raw')}
+                  className={`px-4 py-2 rounded-xl text-xs font-bold transition-all ${viewMode === 'raw' ? 'bg-teal-600 text-white' : 'bg-slate-800 text-slate-400 border border-slate-700'}`}
+                >
+                  Image brute
+                </button>
+                <button 
+                  onClick={() => setViewMode('gradcam')}
+                  className={`px-4 py-2 rounded-xl text-xs font-bold transition-all ${viewMode === 'gradcam' ? 'bg-teal-600 text-white' : 'bg-slate-800 text-slate-400 border border-slate-700'}`}
+                >
+                  Grad-CAM
+                </button>
+              </>
+            )}
             <button 
               onClick={() => setIsFullScreenImage(false)}
               className="bg-rose-600/80 hover:bg-rose-500 text-white font-bold px-4 py-2 rounded-xl text-xs transition-colors"
@@ -1434,7 +1505,7 @@ export default function App() {
           </div>
 
           <div className="max-w-5xl max-h-[85vh] w-full flex items-center justify-center p-2" onClick={e => e.stopPropagation()}>
-            {showGradCam ? (
+            {viewMode === 'gradcam' ? (
               selectedPatient.result?.grad_cam ? (
                 <img 
                   src={selectedPatient.result.grad_cam} 
@@ -1445,6 +1516,19 @@ export default function App() {
                 <div className="text-slate-500 text-sm flex flex-col items-center gap-2">
                   <AlertCircle className="w-8 h-8" />
                   <span>Heatmap Grad-CAM non disponible</span>
+                </div>
+              )
+            ) : viewMode === 'cropped' ? (
+              selectedPatient.image_cropped_base64 ? (
+                <img 
+                  src={selectedPatient.image_cropped_base64} 
+                  alt="Cropped eye disc Fullscreen" 
+                  className="max-w-full max-h-[80vh] object-contain rounded-2xl border border-slate-800 shadow-2xl"
+                />
+              ) : (
+                <div className="text-slate-500 text-sm flex flex-col items-center gap-2">
+                  <AlertCircle className="w-8 h-8" />
+                  <span>Image recadrée non disponible</span>
                 </div>
               )
             ) : (
@@ -1463,7 +1547,7 @@ export default function App() {
             )}
           </div>
           <p className="text-xs text-slate-500 mt-4 select-none">
-            {showGradCam ? "Visualisation de l'analyse IA (Grad-CAM)" : "Visualisation du fond d'œil brut (Original)"} — Cliquer n'importe où pour fermer
+            Visualisation en mode {viewMode === 'gradcam' ? 'Grad-CAM' : viewMode === 'cropped' ? 'Image crop' : "Image brute (Originale)"} — Cliquer n'importe où pour fermer
           </p>
         </div>
       )}
