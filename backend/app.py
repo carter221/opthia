@@ -18,6 +18,7 @@ from pydicom.dataset import Dataset, FileDataset
 from pydicom.uid import ExplicitVRLittleEndian, generate_uid
 import requests
 from PIL import Image
+import numpy as np
 
 app = Flask(__name__)
 # Autoriser les requêtes cross-origin depuis notre futur front-end React
