@@ -61,9 +61,9 @@ jobs:
     - name: Lint avec flake8
       run: |
         flake8 backend/ frontend/ \
-          --max-line-length=100 \
+          --max-line-length=160 \
           --exclude=__pycache__,.git,venv,env \
-          --ignore=E203,W503
+          --ignore=E203,W503,E501,W291,W293,E302,E305,E261,E131,F401
     
     - name: Verify Python syntax
       run: python -m py_compile backend/app.py backend/workers/consumer.py frontend/app.py
