@@ -2,9 +2,9 @@ name: CI - Tests et Vérification Docker
 
 on:
   push:
-    branches: [ main, develop ]
+    branches: [ main, develop,ophtia-remote ]
   pull_request:
-    branches: [ main, develop ]
+    branches: [ main, develop,ophtia-remote ]
 
 jobs:
   lint:
