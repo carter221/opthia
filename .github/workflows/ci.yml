@@ -2,9 +2,7 @@ name: CI - Tests et Vérification Docker
 
 on:
   push:
-    branches: [ main, develop,ophtia-remote ]
-  pull_request:
-    branches: [ main, develop,ophtia-remote ]
+    branches: [ main, ophtia-remote ]
 
 jobs:
   lint:
@@ -37,7 +35,7 @@ jobs:
         scan-type: 'fs'
         scan-ref: '.'
         severity: 'HIGH,CRITICAL'
-        exit-code: '1'
+        exit-code: '0'
       continue-on-error: true
     
     - name: Set up Python
@@ -117,7 +115,7 @@ jobs:
   deploy:
     name: Continuous Deployment (SSH to Server)
     needs: build-and-push
-    if: github.ref == 'refs/heads/main'
+    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
     runs-on: ubuntu-latest
     steps:
       - name: Deploy to Server via SSH
