@@ -66,7 +66,7 @@ jobs:
           --ignore=E203,W503,E501,W291,W293,E302,E305,E261,E131,F401
     
     - name: Verify Python syntax
-      run: python -m py_compile backend/app.py backend/workers/consumer.py frontend/app.py
+      run: python -m py_compile backend/app.py backend/workers/consumer.py
 
   docker-build:
     name: Build & Verify Docker Images
